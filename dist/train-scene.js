@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.js';
-import {FLOOR_AREAS,FLOOR_ZONES} from './floor-layout.js';
-import {TRAIN_SERVICES} from './train-data.js?v=5';
+import {FLOOR_AREAS,FLOOR_ZONES} from './floor-layout.js?v=6';
+import {TRAIN_SERVICES} from './train-data.js?v=6';
 
 // Stationary representative rolling stock for the schematic platform islands.
 // Bodies, bogies, doors and windows share geometry and are instanced per train.

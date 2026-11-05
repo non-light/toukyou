@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {ZONES, WALK_AREAS, GROUPS, insideWalkArea} from './station-layout.js';
+import {ZONES, WALK_AREAS, GROUPS, insideWalkArea} from './station-layout.js?v=6';
 
 // A walkable architectural interpretation, not a surveyed station model.
 // x=east, z=south. All connections follow station-layout.js.

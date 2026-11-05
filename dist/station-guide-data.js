@@ -1,5 +1,6 @@
-import {FLOOR_AREAS,FLOOR_ZONES,LINE_GROUPS,insideFloor} from './floor-layout.js';
-import {GROUPS} from './station-layout.js';
+import {landmarkAt} from './landmarks.js?v=6';
+import {FLOOR_AREAS,FLOOR_ZONES,LINE_GROUPS,insideFloor} from './floor-layout.js?v=6';
+import {GROUPS} from './station-layout.js?v=6';
 
 // Positions describe this walkable model. Location is the player's position in
 // the model, not GPS or a claim about their position in the real station.
@@ -26,6 +27,7 @@ function zoneResult(zone,areaLabel){return result(zone.id,zone.title,zone.floor,
 export function resolveLocation({x,z,floor='1F'}={}){
   const areas=FLOOR_AREAS[floor]??[],index=areas.findIndex(a=>x>=a.minX&&x<=a.maxX&&z>=a.minZ&&z<=a.maxZ);
   if(!Number.isFinite(x)||!Number.isFinite(z)||index<0)return result(`outside-${floor}`,'散策エリアの外',floor,'散策エリア外','general',false);
+  const landmark=landmarkAt(x,z,floor);if(landmark)return result(landmark.id,landmark.title,floor,landmark.areaLabel,landmark.group,landmark.paid);
   if(floor==='1F'){
     if(x<-40){const side=z<-15?'north':z>15?'south':'central',title=z<-15?'丸の内北口側':z>15?'丸の内南口ドーム':'丸の内中央口側';return result(`marunouchi-public-${side}`,title,floor,'改札外・丸の内側','general',false);}
     if(x>48){const side=z<-15?'north':z>15?'south':'central';return result(`yaesu-public-${side}`,`八重洲${side==='north'?'北口':side==='south'?'南口':'中央口'}側`,floor,'改札外・八重洲側','general',false);}

@@ -1,4 +1,5 @@
-import {ZONES as GROUND_ZONES,WALK_AREAS as GROUND_AREAS,NODES as GROUND_NODES} from './station-layout.js';
+import {LANDMARKS} from './landmarks.js?v=6';
+import {ZONES as GROUND_ZONES,WALK_AREAS as GROUND_AREAS,NODES as GROUND_NODES} from './station-layout.js?v=6';
 export const FLOORS=[
  {id:'2F',elevation:8,title:'地上ホーム',description:'在来線1〜10番線・新幹線14〜19／20〜23番線',defaultZone:'platform-chuo'},
  {id:'M2F',elevation:4,title:'中間階',description:'新幹線の連絡階と八重洲側の飲食フロア（エリア間は分離）',defaultZone:'m2-east-north'},
@@ -29,7 +30,8 @@ export const FLOOR_ZONES=[...GROUND_ZONES.map(z=>({...z,floor:'1F'})),spot('keiy
  spot('keiyo-marunouchi','京葉地下丸の内口','B2F',-12,294,'keiyo','exit'),spot('keiyo-yaesu','京葉地下八重洲口','B2F',48,294,'keiyo','exit'),spot('keiyo-concourse','京葉地下改札コンコース','B2F',16,300,'keiyo'),
  spot('keiyo-intermediate','京葉線 中間コンコース','B3F',16,302,'keiyo','passage',{body:'京葉B2Fの改札コンコースとB4Fホームの間にあるB3Fです。上下の階段・エスカレーターを経由します。'}),
  spot('keiyo-platform-12','京葉線 地下1・2番線','B4F',10,294,'keiyo','platform',{yaw:Math.PI/2,body:'京葉線・武蔵野線系統の地下ホームです。京葉線ホームはB4Fで、総武・横須賀線のB5Fホームとは別の場所です。'}),spot('keiyo-platform-34','京葉線 地下3・4番線','B4F',10,312,'keiyo','platform',{yaw:Math.PI/2}),spot('sobu-concourse','総武地下コンコース','B4F',-49,0,'sobu','passage',{body:'丸の内側にある総武快速線・横須賀線のB4Fコンコースです。同じB4Fでも南側の京葉線ホームとは離れた別エリアで、同一階を歩いて直接移動する通路は作っていません。'}),
- spot('sobu-platform-12','総武・横須賀線 地下1・2番線','B5F',-56,0,'sobu','platform'),spot('sobu-platform-34','総武・横須賀線 地下3・4番線','B5F',-42,0,'sobu','platform')
+ spot('sobu-platform-12','総武・横須賀線 地下1・2番線','B5F',-56,0,'sobu','platform'),spot('sobu-platform-34','総武・横須賀線 地下3・4番線','B5F',-42,0,'sobu','platform'),
+ ...LANDMARKS
 ];
 export const LINE_GROUPS={keiyo:{label:'京葉線・武蔵野線',shortLabel:'京葉線',color:'#e797a1',area:'京葉線 改札内',platforms:'地下1〜4番線'},sobu:{label:'総武快速線・横須賀線',shortLabel:'総武・横須賀線',color:'#a5b7e7',area:'総武線 改札内',platforms:'地下1〜4番線'}};
 const end=(floor,x,z)=>({floor,x,z});

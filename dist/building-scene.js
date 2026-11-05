@@ -1,9 +1,10 @@
 import * as THREE from './vendor/three.module.js';
-import {createStationScene} from './scene.js';
-import {FLOORS,FLOOR_AREAS,FLOOR_ZONES,CONNECTORS,LINE_GROUPS} from './floor-layout.js';
-import {GROUPS} from './station-layout.js';
-import {TRAIN_SERVICES} from './train-data.js?v=5';
-import {addStationTrains} from './train-scene.js?v=5';
+import {createStationScene} from './scene.js?v=6';
+import {FLOORS,FLOOR_AREAS,FLOOR_ZONES,CONNECTORS,LINE_GROUPS} from './floor-layout.js?v=6';
+import {GROUPS} from './station-layout.js?v=6';
+import {TRAIN_SERVICES} from './train-data.js?v=6';
+import {addStationTrains} from './train-scene.js?v=6';
+import {addStationLandmarks} from './landmark-scene.js?v=6';
 
 // Separate floor groups are cutaways: sharing a floor number never creates a
 // passage between disconnected areas, especially the Keiyo and Sobu buildings.
@@ -48,7 +49,19 @@ export function createBuildingScene(){
     }else{
       for(const xx of [a.minX,a.maxX]){box(f,.24,height,d,xx,height/2,z,modern?cream:plaster);box(f,.28,.75,d,xx,.37,z,steel);addCollider(f,xx,z,.24,d);}
       for(const zz of [a.minZ,a.maxZ]){box(f,w,height,.24,x,height/2,zz,modern?cream:plaster);box(f,w,.75,.28,x,.37,zz,steel);addCollider(f,x,zz,w,.24);}
-      box(f,w,.2,d,x,height+.08,z,white);
+      if(f==='B1F'&&a.minZ<40){
+        // Open the underground ceiling above SQUARE ZERO's tall light court.
+        const opening={minX:-7,maxX:11,minZ:-28,maxZ:-10};
+        for(const panel of [
+          {minX:a.minX,maxX:opening.minX,minZ:a.minZ,maxZ:a.maxZ},
+          {minX:opening.maxX,maxX:a.maxX,minZ:a.minZ,maxZ:a.maxZ},
+          {minX:opening.minX,maxX:opening.maxX,minZ:a.minZ,maxZ:opening.minZ},
+          {minX:opening.minX,maxX:opening.maxX,minZ:opening.maxZ,maxZ:a.maxZ}
+        ])box(f,panel.maxX-panel.minX,.2,panel.maxZ-panel.minZ,(panel.minX+panel.maxX)/2,height+.08,(panel.minZ+panel.maxZ)/2,white);
+        box(f,18,.2,18,2,6.9,-19,white);
+        for(const xx of [-7,11])box(f,.16,3.2,18,xx,5.25,-19,plaster);
+        for(const zz of [-28,-10])box(f,18,3.2,.16,2,5.25,zz,plaster);
+      }else box(f,w,.2,d,x,height+.08,z,white);
       if(d>w){for(let zz=a.minZ+5;zz<a.maxZ;zz+=9)box(f,w-2,.035,.1,x,height-.08,zz,lamp);}
       else for(let xx=a.minX+5;xx<a.maxX;xx+=11)box(f,.1,.035,d-2,xx,height-.08,z,lamp);
     }
@@ -71,7 +84,7 @@ export function createBuildingScene(){
   for(const zone of FLOOR_ZONES.filter(z=>z.floor==='M2F')){const color=groups[zone.group]?.color??'#d7c18d';doubleSign('M2F',3.9,.85,zone.x,2.8,zone.z,[zone.title,'連絡階 / INTERMEDIATE FLOOR'],color);}
   // The main B1 concourse is broad and tiled, with underground exit gates and
   // shop windows along the perimeter. It never joins the Keiyo passage on B1F.
-  for(const [x,z,ry] of [[-58,-17,Math.PI/2],[-58,17,Math.PI/2],[60,-18,-Math.PI/2],[60,18,-Math.PI/2]]){
+  for(const [x,z,ry] of [[-58,-17,Math.PI/2],[60,-18,-Math.PI/2],[60,18,-Math.PI/2]]){
     box('B1F',.8,2.25,7,x,1.2,z,dark);sign('B1F',6,.5,x+(x<0?.5:-.5),2.75,z,['地下街 / SHOPS','TOKYO STATION'], '#e3ce98',ry);for(const zz of [z-2,z,z+2])box('B1F',1.15,.7,1.7,x,.35,zz,wood);
   }
   for(const [x,title] of [[-49,'丸の内地下中央口'],[54,'八重洲地下中央口']]){
@@ -129,6 +142,7 @@ export function createBuildingScene(){
   const building={scene,collidersByFloor,hotspots,zones:FLOOR_ZONES,floorGroups,setFloor,setRouteGroup,update,dispose(){base.dispose?.();ownedTextures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());for(const [id,g] of Object.entries(floorGroups))if(id!=='1F')g.traverse(o=>{o.geometry?.dispose();});}};
   const rollingStock=addStationTrains(building),disposeBuilding=building.dispose;
   building.trains=rollingStock.trains;building.trainServices=TRAIN_SERVICES;
-  building.dispose=()=>{rollingStock.dispose();disposeBuilding();};
+  const meetingPlaces=addStationLandmarks(building);building.landmarks=meetingPlaces.landmarks;
+  building.dispose=()=>{meetingPlaces.dispose();rollingStock.dispose();disposeBuilding();};
   return building;
 }
