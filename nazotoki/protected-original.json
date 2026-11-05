@@ -1,0 +1,16 @@
+{
+  "purpose": "Keep the completed Tokyo Station 3D walk unchanged while developing a separate game.",
+  "original": {
+    "version": "0.6.0",
+    "project_id": "appgprj_6aeaa93f4ea48191b342bc4a33dcde88",
+    "saved_version_number": 6,
+    "url": "https://tokyo-station-walk-noriko.workspace-397612.chatgpt.site",
+    "github_commit": "314300f107a5674b849cd5fdb88f5aa4f0cdec1d",
+    "github_tag": "tokyo-station-original-v0.6-20261105"
+  },
+  "development": {
+    "project_id": "appgprj_6aec2c90b13c8191bb14c9c12644b58d",
+    "github_branch": "game-development",
+    "workspace_folder": "toukyoukarano-game"
+  }
+}

@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+*.zip
+/dist/server/
+/dist/client/
+/dist/.openai/
+/server-app/public/

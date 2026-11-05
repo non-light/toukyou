@@ -1,0 +1,17 @@
+{
+  "description": "Unchanged station geometry, floors, passages, landmarks, gates, trains and map from the game edition before the ticket episode.",
+  "sha256": {
+    "dist/scene.js": "aa3d06476a9689bfcbcc904b3ab848bf15bdd8f2cfde970d44ecd15bd92aa6d8",
+    "dist/building-scene.js": "85fccf52372696fc665e287f3292b8b3719fbf88cd616702fa9352f8a7ddf983",
+    "dist/station-layout.js": "6ff95333e7737dfc9131b6f2ca56d48a22067b56cc230f3ca502aff49bec7226",
+    "dist/floor-layout.js": "88114af198402985ed9c723baaca6e6edf38e76f30ab6dd353b477c4ded54ee1",
+    "dist/station-guide-data.js": "3da7b4d026802e913681d70faf9e30f85c5a32b1200e88b4b01822101835bec5",
+    "dist/station-map.js": "58d562ba9f77281c799fb27f23aae8e95ad3d3404baf2d552d85832282571ce0",
+    "dist/gate-visuals.js": "468e2e9c664a5b67fb9d1f4fe34674a16ef7c314b7a08f2ae8db94414c2f67fd",
+    "dist/train-data.js": "7dd3cc186ca9b32225f870314aabb231c74b3ad7aa2e37922290418644b177e5",
+    "dist/train-scene.js": "1aa087a81361ada462a449f17005faeded46ff8c08b614e794e1b89df91dfb50",
+    "dist/landmarks.js": "fc1ef57122d6f274834e1ea77cf2168192f11a58c27138956988f7cf4115a7d1",
+    "dist/landmark-scene.js": "f5fa4f6092417543fd0af049ea183431395755e043b42d6faee32dfed21aa6e5",
+    "dist/vendor/three.module.js": "0a3368c165eea773490aec7b77c22de70e3eac288503409256fdbf4d12578416"
+  }
+}
