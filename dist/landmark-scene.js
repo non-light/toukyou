@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {LANDMARKS} from './landmarks.js?v=6';
+import {LANDMARKS} from './landmarks.js?v=game1';
 
 // Original simplified exhibits: all solid furniture has a matching footprint.
 export function addStationLandmarks(building){

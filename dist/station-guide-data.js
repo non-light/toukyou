@@ -1,6 +1,6 @@
-import {landmarkAt} from './landmarks.js?v=6';
-import {FLOOR_AREAS,FLOOR_ZONES,LINE_GROUPS,insideFloor} from './floor-layout.js?v=6';
-import {GROUPS} from './station-layout.js?v=6';
+import {landmarkAt} from './landmarks.js?v=game1';
+import {FLOOR_AREAS,FLOOR_ZONES,LINE_GROUPS,insideFloor} from './floor-layout.js?v=game1';
+import {GROUPS} from './station-layout.js?v=game1';
 
 // Positions describe this walkable model. Location is the player's position in
 // the model, not GPS or a claim about their position in the real station.

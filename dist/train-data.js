@@ -1,4 +1,4 @@
-import {FLOOR_AREAS,FLOOR_ZONES} from './floor-layout.js?v=6';
+import {FLOOR_AREAS,FLOOR_ZONES} from './floor-layout.js?v=game1';
 
 // Representative, stationary visual models. Five-car consists are shortened to
 // fit this schematic; neither a dedicated platform assignment nor a timetable.

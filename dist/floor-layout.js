@@ -1,5 +1,5 @@
-import {LANDMARKS} from './landmarks.js?v=6';
-import {ZONES as GROUND_ZONES,WALK_AREAS as GROUND_AREAS,NODES as GROUND_NODES} from './station-layout.js?v=6';
+import {LANDMARKS} from './landmarks.js?v=game1';
+import {ZONES as GROUND_ZONES,WALK_AREAS as GROUND_AREAS,NODES as GROUND_NODES} from './station-layout.js?v=game1';
 export const FLOORS=[
  {id:'2F',elevation:8,title:'地上ホーム',description:'在来線1〜10番線・新幹線14〜19／20〜23番線',defaultZone:'platform-chuo'},
  {id:'M2F',elevation:4,title:'中間階',description:'新幹線の連絡階と八重洲側の飲食フロア（エリア間は分離）',defaultZone:'m2-east-north'},

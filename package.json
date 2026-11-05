@@ -1,12 +1,12 @@
 {
-  "name": "tokyo-station-walk",
+  "name": "tokyo-station-game-studio",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.1.0",
   "type": "module",
-  "description": "Mobile-first Tokyo Station inspired 3D walking prototype",
+  "description": "Independent game edition of the preserved Tokyo Station 3D walk",
   "scripts": {
-    "start": "python3 -m http.server 4173 --directory dist",
-    "check": "node --check dist/app.js && node --check dist/scene.js && node --check dist/station-layout.js && node --check dist/station-map.js && node --check dist/floor-layout.js && node --check dist/building-scene.js && node --check dist/station-guide-data.js && node --check dist/gate-visuals.js && node --check dist/train-data.js && node --check dist/train-scene.js && node --check dist/landmarks.js && node --check dist/landmark-scene.js && node --check dist/sw.js",
+    "start": "python3 -m http.server 4175 --directory dist",
+    "check": "node scripts/check-original.mjs && node --check dist/app.js && node --check dist/scene.js && node --check dist/station-layout.js && node --check dist/station-map.js && node --check dist/floor-layout.js && node --check dist/building-scene.js && node --check dist/station-guide-data.js && node --check dist/gate-visuals.js && node --check dist/train-data.js && node --check dist/train-scene.js && node --check dist/landmarks.js && node --check dist/landmark-scene.js && node --check dist/sw.js && node --check dist/game/content.js && node --check dist/game/state.js && node --check dist/game/characters.js && node --check dist/game/addon.js",
     "test": "CHECK_SCENE=1 CHECK_BUILDING_SCENE=1 node --test tests/*.test.mjs"
   }
 }

@@ -1,6 +1,6 @@
-import {GROUPS as BASE_GROUPS} from './station-layout.js?v=6';
-import {FLOOR_AREAS,FLOOR_ZONES,FLOORS,LINE_GROUPS,CONNECTORS} from './floor-layout.js?v=6';
-import {GATES,resolveLocation} from './station-guide-data.js?v=6';
+import {GROUPS as BASE_GROUPS} from './station-layout.js?v=game1';
+import {FLOOR_AREAS,FLOOR_ZONES,FLOORS,LINE_GROUPS,CONNECTORS} from './floor-layout.js?v=game1';
+import {GATES,resolveLocation} from './station-guide-data.js?v=game1';
 
 const NS='http://www.w3.org/2000/svg',GROUPS={...BASE_GROUPS,...LINE_GROUPS};
 const COLORS={public:'#dedfd0',general:'#b9caaa',east:'#b5d3dd',tokaido:'#e7c89f',keiyo:'#e5bdc7',sobu:'#c5bddd'};

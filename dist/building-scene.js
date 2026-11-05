@@ -1,10 +1,10 @@
 import * as THREE from './vendor/three.module.js';
-import {createStationScene} from './scene.js?v=6';
-import {FLOORS,FLOOR_AREAS,FLOOR_ZONES,CONNECTORS,LINE_GROUPS} from './floor-layout.js?v=6';
-import {GROUPS} from './station-layout.js?v=6';
-import {TRAIN_SERVICES} from './train-data.js?v=6';
-import {addStationTrains} from './train-scene.js?v=6';
-import {addStationLandmarks} from './landmark-scene.js?v=6';
+import {createStationScene} from './scene.js?v=game1';
+import {FLOORS,FLOOR_AREAS,FLOOR_ZONES,CONNECTORS,LINE_GROUPS} from './floor-layout.js?v=game1';
+import {GROUPS} from './station-layout.js?v=game1';
+import {TRAIN_SERVICES} from './train-data.js?v=game1';
+import {addStationTrains} from './train-scene.js?v=game1';
+import {addStationLandmarks} from './landmark-scene.js?v=game1';
 
 // Separate floor groups are cutaways: sharing a floor number never creates a
 // passage between disconnected areas, especially the Keiyo and Sobu buildings.

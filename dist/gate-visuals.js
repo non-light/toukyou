@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.js';
-import {GATES} from './station-guide-data.js?v=6';
+import {GATES} from './station-guide-data.js?v=game1';
 
 // Automatic animated flaps decorate the model's existing center lanes. They
 // deliberately add no collision: the original gate posts remain the physical
