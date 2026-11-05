@@ -1,0 +1,12 @@
+{
+  "name": "tokyo-station-walk",
+  "private": true,
+  "version": "0.5.0",
+  "type": "module",
+  "description": "Mobile-first Tokyo Station inspired 3D walking prototype",
+  "scripts": {
+    "start": "python3 -m http.server 4173 --directory dist",
+    "check": "node --check dist/app.js && node --check dist/scene.js && node --check dist/station-layout.js && node --check dist/station-map.js && node --check dist/floor-layout.js && node --check dist/building-scene.js && node --check dist/station-guide-data.js && node --check dist/gate-visuals.js && node --check dist/train-data.js && node --check dist/train-scene.js && node --check dist/sw.js",
+    "test": "CHECK_SCENE=1 CHECK_BUILDING_SCENE=1 node --test tests/*.test.mjs"
+  }
+}
