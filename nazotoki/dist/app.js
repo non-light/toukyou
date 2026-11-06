@@ -1,5 +1,5 @@
 import {createShoulderCamera} from './game/shoulder-camera.js?v=shoulder1';
-import {createGameAddon} from './game/addon.js?v=hud1';
+import {createGameAddon} from './game/addon.js?v=fix1';
 import * as THREE from './vendor/three.module.js';
 import {createBuildingScene} from './building-scene.js?v=game1';
 import {GROUPS as BASE_GROUPS,areaAt,zoneLabel} from './station-layout.js?v=game1';

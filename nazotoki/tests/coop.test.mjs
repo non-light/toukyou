@@ -4,6 +4,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {readFileSync, readdirSync} from 'node:fs';
 import {handleRooms} from '../server-app/lib/rooms.mjs';
 import {resolveAction} from '../server-app/lib/room-state.mjs';
+import {requestRoom, roomSessionEnded} from '../dist/game/ticket-session.js';
 
 function database() {
   const sqlite = new DatabaseSync(':memory:');
@@ -130,6 +131,20 @@ test('the final delivery never skips the order puzzle', () => {
   assert.equal(result.ok, false);
   assert.equal(result.stage, 2);
   assert.equal(result.delivered, false);
+});
+
+test('a reclaimed seat and expired room return errors the client can recover from', async () => {
+  const db = database();
+  const owner = (await api(db, '', {name:'戻る旅人'})).data;
+  const code = owner.room.code;
+  db.sqlite.prepare('UPDATE ticket_members SET last_seen = ? WHERE id = ?').run(Date.now()-91000,owner.selfId);
+  assert.equal((await api(db,'/'+code+'/join',{name:'次の旅人'})).status,201);
+  const fetcher = (path, options) => handleRooms(new Request('https://ticket.test'+path,options),db,path.slice('/api/rooms'.length).split('/').filter(Boolean));
+  const payload={token:owner.token,position:{x:34,z:10,floor:'B1F'}};
+  await assert.rejects(requestRoom('/api/rooms/'+code+'/sync',payload,fetcher),error=>error.status===401&&roomSessionEnded(error));
+  db.sqlite.prepare('UPDATE ticket_rooms SET expires_at = ? WHERE code = ?').run(Date.now()-1,code);
+  await assert.rejects(requestRoom('/api/rooms/'+code+'/sync',payload,fetcher),error=>error.status===404&&roomSessionEnded(error));
+  db.sqlite.close();
 });
 
 test('automatic avatar assignment stays distinct under concurrent joins and a departing avatar is reusable', async () => {
