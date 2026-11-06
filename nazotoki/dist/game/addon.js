@@ -1,7 +1,7 @@
 import {GAME_CONTENT} from './content.js?v=game1';
 import {createGameState} from './state.js?v=game1';
 import {createCharacterLayer} from './characters.js?v=game1';
-import {createTicketEpisode} from './ticket.js?v=shoulder1';
+import {createTicketEpisode} from './ticket.js?v=hud1';
 
 const clone=value=>JSON.parse(JSON.stringify(value));
 const make=(tag,className,text)=>{const element=document.createElement(tag);if(className)element.className=className;if(text!==undefined)element.textContent=text;return element;};

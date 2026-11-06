@@ -1,5 +1,5 @@
 import {createShoulderCamera} from './game/shoulder-camera.js?v=shoulder1';
-import {createGameAddon} from './game/addon.js?v=shoulder1';
+import {createGameAddon} from './game/addon.js?v=hud1';
 import * as THREE from './vendor/three.module.js';
 import {createBuildingScene} from './building-scene.js?v=game1';
 import {GROUPS as BASE_GROUPS,areaAt,zoneLabel} from './station-layout.js?v=game1';
@@ -139,6 +139,8 @@ function setupGameEdition(){
  gameAddon=createGameAddon({station,zones:ZONES,reducedMotion,
   getPlayer:()=>({x:player.x,y:player.y,z:player.z,floor:currentFloor,yaw,walking,movementMode:effectiveMovementMode()}),
   getCameraOpacity:()=>cameraAvatarOpacity,
+  getLocation:()=>resolveLocation({x:player.x,z:player.z,floor:currentFloor}),
+  openMap:()=>openPanel('map'),openSettings:()=>openPanel('settings'),openHelp:()=>openPanel('help'),
   project:({x,y,z})=>{const point=new THREE.Vector3(x,y,z).project(camera);return {x:(point.x*.5+.5)*innerWidth,y:(-.5*point.y+.5)*innerHeight,visible:point.z>-1&&point.z<1&&Math.abs(point.x)<.95&&Math.abs(point.y)<.95}},
   isActive:()=>started&&!activePanel&&!activeSpot&&!floorTravel&&!gameOverlayOpen,
   isAllowed:(x,z,floor)=>allowed(x,z,floor),

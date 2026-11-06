@@ -17,11 +17,15 @@ export function createTicketEpisode(api){
   let progress=sanitizeProgress(saved),playing=false,lensOn=false,dialog=null,previousFocus=null,sequence=[],hintLevel=0,disposed=false,busy=false,team=null,syncing=null,lastPoll=0,networkError='',lastHud='',lastGhost='',lastMembers='',lastTick=0;
   const peers=new Map(),listeners=[];
   const root=make('div');root.id='ticket-game';document.body.append(root);
+  const embedded=window.self!==window.top;if(embedded)document.body.dataset.ticketEmbedded='true';
   const hud=make('aside','tg-hud');hud.hidden=true;hud.setAttribute('aria-label','物語の進み具合');
   const eyebrow=make('p','tg-eyebrow','時をこえた一通 · 第1話'),objective=make('strong'),progressRow=make('div','tg-progress'),status=make('small','tg-room','1人で探索中'),memberList=make('div','tg-members');
   const actions=make('div','tg-actions');actions.append(button('手帳',()=>open('notebook')),button('道案内',()=>open('route')),button('ヒント',()=>{hintLevel=0;open('hint');}),button('仲間',()=>open('team')));
   hud.append(eyebrow,objective,progressRow,status,memberList,actions);root.append(hud);
   const traveler=button('',()=>open('avatar'),'tg-traveler');traveler.setAttribute('aria-label','自分の旅人を選ぶ');hud.insertBefore(traveler,progressRow);
+  const compact=make('aside','tg-compact');compact.hidden=true;compact.setAttribute('aria-label','現在の階と目的地');
+  const compactFloor=make('span','tg-compact-floor'),compactGoal=make('strong','tg-compact-goal'),infoToggle=button('情報',()=>open('info'),'tg-info-toggle');
+  infoToggle.id='ticket-info';infoToggle.setAttribute('aria-label','ゲームの情報を開く');infoToggle.setAttribute('aria-expanded','false');infoToggle.setAttribute('aria-controls','ticket-dialog');compact.append(compactFloor,compactGoal,infoToggle);root.append(compact);
   const lens=make('div','tg-lens');lens.hidden=true;lens.setAttribute('role','region');lens.setAttribute('aria-label','切符越しの昔の案内');
   const lensHead=make('div','tg-lens-head','TOKYO STATION  ·  時うつしの切符'),windowPane=make('div','tg-lens-window'),ghost=make('div','tg-ghost'),lensFoot=make('div','tg-lens-foot','この窓に、昔の言葉があらわれる。');windowPane.append(ghost);lens.append(lensHead,windowPane,lensFoot);root.append(lens);
   const prompt=make('div','tg-prompt');prompt.hidden=true;prompt.setAttribute('role','status');root.append(prompt);
@@ -29,16 +33,16 @@ export function createTicketEpisode(api){
   const read=button('昔の案内を読む',readClue,'tg-primary');read.hidden=true;read.id='ticket-read';
   const ticket=button('切符をかざす',()=>{lensOn=!lensOn;ticket.setAttribute('aria-pressed',String(lensOn));refresh();},'tg-primary tg-floating');ticket.id='ticket-toggle';ticket.prepend(ticketIcon('ticket'));ticket.setAttribute('aria-pressed','false');
   toolbar.append(read,ticket);root.append(toolbar);
-  const scrim=make('div','tg-scrim');scrim.hidden=true;const panel=make('section','tg-panel');panel.hidden=true;panel.tabIndex=-1;panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','tg-dialog-title');root.append(scrim,panel);
+  const scrim=make('div','tg-scrim');scrim.hidden=true;const panel=make('section','tg-panel');panel.id='ticket-dialog';panel.hidden=true;panel.tabIndex=-1;panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','tg-dialog-title');root.append(scrim,panel);
   const launch=button('物語をはじめる',()=>open('intro'),'primary');launch.id='ticket-start';launch.prepend(ticketIcon('ticket'));
   document.querySelector('#welcome #start')?.before(launch);
   const resume=button('物語に戻る',()=>{if(!playing)begin(false);else refresh();},'game-studio-nav');resume.id='ticket-resume';resume.prepend(ticketIcon('ticket'));document.querySelector('.bottom-nav')?.append(resume);
   const on=(node,type,handler,options)=>{node.addEventListener(type,handler,options);listeners.push(()=>node.removeEventListener(type,handler,options));};
   function persist(){if(team)return;try{localStorage.setItem(saveKey,JSON.stringify(progress));}catch{}}
   function feedback(message){if(!dialog){api.onNotice(message);return;}let p=panel.querySelector('.tg-feedback');if(!p){p=make('p','tg-feedback');p.setAttribute('role','status');panel.append(p);}p.textContent=message;}
-  function close(){if(!dialog){if(lensOn){lensOn=false;refresh();}return;}avatarPreview?.dispose();avatarPreview=null;dialog=null;panel.hidden=scrim.hidden=true;panel.replaceChildren();api.onModalChange(false);if(previousFocus?.isConnected)previousFocus.focus();previousFocus=null;refresh();}
-  function open(type){api.beforeModal?.();if(!dialog){previousFocus=document.activeElement;api.onModalChange(true);}dialog=type;scrim.hidden=panel.hidden=false;lens.hidden=true;sequence=[];renderDialog();panel.querySelector('button,input')?.focus();}
-  function header(title,kicker='東京駅のふしぎな切符'){const h=make('header','tg-panel-head'),text=make('div');text.append(make('p','tg-eyebrow',kicker));const titleEl=make('h2','tg-title',title);titleEl.id='tg-dialog-title';text.append(titleEl);const x=button('×',close,'tg-close');x.setAttribute('aria-label','閉じる');h.append(text,x);panel.append(h);}
+  function close(){if(!dialog){if(lensOn){lensOn=false;refresh();}return;}avatarPreview?.dispose();avatarPreview=null;dialog=null;infoToggle.setAttribute('aria-expanded','false');panel.hidden=scrim.hidden=true;panel.replaceChildren();api.onModalChange(false);if(previousFocus?.isConnected)previousFocus.focus();previousFocus=null;refresh();}
+  function open(type){api.beforeModal?.();if(!dialog){previousFocus=document.activeElement;api.onModalChange(true);}dialog=type;infoToggle.setAttribute('aria-expanded',String(type==='info'));scrim.hidden=panel.hidden=false;lens.hidden=true;sequence=[];renderDialog();panel.scrollTop=0;panel.querySelector('button,input')?.focus({preventScroll:true});}
+  function header(title,kicker='東京駅のふしぎな切符'){const h=make('header','tg-panel-head'),text=make('div');text.append(make('p','tg-eyebrow',kicker));const titleEl=make('h2','tg-title',title);titleEl.id='tg-dialog-title';text.append(titleEl);const x=button(dialog==='info'?'閉じる':'×',close,'tg-close');x.setAttribute('aria-label',dialog==='info'?'ゲーム情報を閉じる':'閉じる');h.append(text,x);panel.append(h);}
   function note(text,cls='tg-note'){panel.append(make('p',cls,text));}
   function addActions(...items){const row=make('div','tg-actions');row.append(...items);panel.append(row);return row;}
   function portrait(id){const avatar=avatarById(id),icon=make('span','tg-avatar-portrait');icon.style.backgroundPosition=`${avatar.portrait*100/3}% center`;icon.setAttribute('aria-hidden','true');return icon;}
@@ -60,7 +64,9 @@ export function createTicketEpisode(api){
   function begin(reset){if(team){void leaveTeam(false);}if(reset)progress=initialProgress();playing=true;document.body.dataset.ticketPlaying='true';close();lensOn=false;api.jumpTo(targetSpot(progress).zoneId);persist();refresh();api.onNotice('まずは「切符をかざす」を押してみましょう。');}
   function renderDialog(){
     avatarPreview?.dispose();avatarPreview=null;
+    panel.dataset.view=dialog??'';
     panel.replaceChildren();
+    if(dialog==='info'){renderInfo();return;}
     if(dialog==='intro'){
       header(EPISODE.title,'第1話 · はじめての謎解き');
       const drawing=make('div','tg-invitation');drawing.append(ticketIcon('ticket'),make('span','','時うつしの切符'),ticketIcon('letter'));panel.append(drawing);
@@ -120,6 +126,20 @@ export function createTicketEpisode(api){
     }
     if(dialog==='team'){renderTeam();}
   }
+  function refreshOpenDialog(){
+    const active=document.activeElement,restore=panel.contains(active),text=active?.textContent,label=active?.getAttribute?.('aria-label'),scroll=panel.scrollTop;
+    renderDialog();panel.scrollTop=scroll;
+    if(restore){const match=[...panel.querySelectorAll('button')].find(item=>(label&&item.getAttribute('aria-label')===label)||(!label&&item.textContent===text));(match??panel.querySelector('.tg-close'))?.focus({preventScroll:true});}
+  }
+  function renderInfo(){
+    header('ゲーム情報','時をこえた一通 · 第1話');
+    const player=api.getPlayer(),location=api.getLocation?.(),target=targetSpot(progress),summary=make('div','tg-info-summary');
+    summary.append(make('p','tg-info-location',`${player.floor} · ${location?.title??'東京駅'}`),make('p','tg-info-next',progress.delivered?'手紙を届けました':progress.stage===3?'宛先の戻った手紙を届けよう':`次の目印：${target.floor} · ${target.title}`),make('p','tg-info-mode',team?(networkError?'再接続を待っています':`${team.members?.filter(member=>member.online).length??1}人で協力中 · 合言葉 ${team.code}`):'1人で探索中'));panel.append(summary);
+    const stamps=make('div','tg-info-stamps');for(let i=0;i<3;i++){const stamp=make('span','tg-stamp');stamp.classList.toggle('is-found',progress.stage>i);stamp.append(ticketIcon(SPOTS[i].id),make('small','',progress.stage>i?'✓':String(i+1)));stamp.setAttribute('aria-label',SPOTS[i].title+(progress.stage>i?'の印を発見済み':'の印は未発見'));stamps.append(stamp);}panel.append(stamps);
+    const menu=make('div','tg-info-actions');menu.append(button('人物を選ぶ',()=>open('avatar')),button('手帳',()=>open('notebook')),button('道案内',()=>open('route')),button('ヒント',()=>{hintLevel=0;open('hint');}),button('仲間',()=>open('team')),button('構内地図',()=>{close();lensOn=false;api.openMap?.();}));panel.append(menu);
+    const utilities=make('div','tg-info-utilities');utilities.append(button('設定',()=>{close();api.openSettings?.();}),button('操作の説明',()=>{close();api.openHelp?.();}));panel.append(utilities);
+    if(team){const members=make('div','tg-info-members tg-members');for(const member of team.members??[]){const item=make('span','',member.name+(member.id===team.selfId?'（あなた）':''));item.prepend(portrait(memberAvatar(member).id));members.append(item);}panel.append(members);}
+  }
   function renderTeam(){
     header('一緒に、駅を歩こう','1〜4人の協力プレイ');
     if(team){
@@ -138,7 +158,7 @@ export function createTicketEpisode(api){
     note('一緒に遊ぶ人にも、このゲームを開く権限が必要です。');
   }
   async function jsonFetch(path,data){const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),cache:'no-store'});let value;try{value=await response.json();}catch{throw new Error('協力プレイに接続できませんでした。少し待って、もう一度お試しください。');}if(!response.ok){const error=new Error(value.error??value.message??'接続を確認して、もう一度お試しください。');error.code=value.code;throw error;}return value;}
-  function acceptRoom(value,session){if(!value.room||session!==team)return;const previous=progress,previousMembers=JSON.stringify(team.members?.map(m=>[m.id,m.name,m.online,m.avatarId]));team.selfId=value.selfId??team.selfId;team.members=value.members??team.members;const self=team.members.find(member=>member.id===team.selfId);if(self)rememberAvatar(memberAvatar(self).id);team.expiresAt=value.room.expiresAt;progress=sanitizeProgress({version:1,stage:Math.max(progress.stage,value.room.stage),delivered:progress.delivered||value.room.delivered});networkError='';refresh();if(playing&&(progress.stage>previous.stage||(!previous.delivered&&progress.delivered))){api.onNotice(progress.delivered?'仲間と一緒に、手紙を届けました。':'仲間の発見が手帳に届きました。');if(!busy&&dialog&&['choice','order','letter'].includes(dialog))open(progress.delivered?'ending':'discovery');else if(!busy&&dialog&&['route','notebook','hint'].includes(dialog))renderDialog();}if(!busy&&['team','avatar'].includes(dialog)&&previousMembers!==JSON.stringify(team.members?.map(m=>[m.id,m.name,m.online,m.avatarId])))renderDialog();}
+  function acceptRoom(value,session){if(!value.room||session!==team)return;const previous=progress,previousMembers=JSON.stringify(team.members?.map(m=>[m.id,m.name,m.online,m.avatarId]));team.selfId=value.selfId??team.selfId;team.members=value.members??team.members;const self=team.members.find(member=>member.id===team.selfId);if(self)rememberAvatar(memberAvatar(self).id);team.expiresAt=value.room.expiresAt;progress=sanitizeProgress({version:1,stage:Math.max(progress.stage,value.room.stage),delivered:progress.delivered||value.room.delivered});networkError='';refresh();if(playing&&(progress.stage>previous.stage||(!previous.delivered&&progress.delivered))){api.onNotice(progress.delivered?'仲間と一緒に、手紙を届けました。':'仲間の発見が手帳に届きました。');if(!busy&&dialog&&['choice','order','letter'].includes(dialog))open(progress.delivered?'ending':'discovery');else if(!busy&&dialog&&['route','notebook','hint','info'].includes(dialog))refreshOpenDialog();}if(!busy&&['team','avatar','info'].includes(dialog)&&previousMembers!==JSON.stringify(team.members?.map(m=>[m.id,m.name,m.online,m.avatarId])))refreshOpenDialog();}
   async function joinTeam(kind,name,code){if(busy)return;if(kind==='join'&&!/^[A-Z0-9]{6}$/.test(code.trim().toUpperCase())){feedback('6文字の合言葉を入力してください。');return;}busy=true;setBusy(true);try{const value=await jsonFetch(kind==='create'?'/api/rooms':`/api/rooms/${encodeURIComponent(code.trim().toUpperCase())}/join`,{name:name.trim()||'旅人',avatarId:selectedAvatar});team={code:value.room.code,token:value.token,selfId:value.selfId,members:[]};progress=initialProgress();acceptRoom(value,team);try{sessionStorage.setItem(teamKey,JSON.stringify({code:team.code,token:team.token,selfId:team.selfId}));}catch{}playing=true;document.body.dataset.ticketPlaying='true';close();api.jumpTo(targetSpot(progress).zoneId);open('team');}catch(e){feedback(e.message);}finally{busy=false;setBusy(false);}}
   async function reconnect(previous){if(busy)return;busy=true;setBusy(true);const solo=progress;try{team={...previous,members:[]};progress=initialProgress();await sync();if(networkError)throw new Error(networkError);playing=true;document.body.dataset.ticketPlaying='true';close();api.jumpTo(targetSpot(progress).zoneId);open('team');}catch(e){team=null;progress=solo;try{sessionStorage.removeItem(teamKey);}catch{}feedback(e.message);}finally{busy=false;setBusy(false);}}
   async function leaveTeam(showIntro){const previous=team;team=null;syncing=null;networkError='';clearPeers();try{sessionStorage.removeItem(teamKey);}catch{}if(previous)void jsonFetch(`/api/rooms/${previous.code}/leave`,{token:previous.token}).catch(()=>{});let local;try{local=JSON.parse(localStorage.getItem(saveKey));}catch{}progress=sanitizeProgress(local);if(showIntro){close();playing=false;delete document.body.dataset.ticketPlaying;open('intro');}refresh();}
@@ -151,8 +171,8 @@ export function createTicketEpisode(api){
   function readClue(){if(!playing||!lensOn)return;const spot=targetSpot(progress);if(!nearSpot(api.getPlayer(),spot)||!isLooking(spot)){api.onNotice('目印の近くで、その方向を見ながら切符をかざしてみましょう。');return;}if(progress.delivered){open('ending');return;}if(progress.stage===0)void submit({type:'bell'});else open(progress.stage===1?'choice':progress.stage===2?'order':'letter');}
   function isLooking(spot){const p=api.getPlayer();return api.project({x:spot.modelX,y:p.y+.65,z:spot.modelZ}).visible;}
   function refresh(){
-    hud.hidden=toolbar.hidden=!playing;resume.hidden=false;root.dataset.playing=String(playing);if(!playing){lens.hidden=prompt.hidden=true;return;}
-    const target=targetSpot(progress),signature=JSON.stringify([progress,selectedAvatar,team?.code,team?.members?.map(m=>[m.id,m.online,m.avatarId]),networkError]);
+    hud.hidden=toolbar.hidden=compact.hidden=!playing;resume.hidden=false;root.dataset.playing=String(playing);if(!playing){lens.hidden=prompt.hidden=true;return;}
+    const target=targetSpot(progress),current=api.getPlayer(),shortNames={bell:'銀の鈴',pillars:'SQUARE ZERO',postbox:'駅舎型ポスト'};compactFloor.textContent=current.floor;compactGoal.textContent=progress.delivered?'手紙を届けました':progress.stage===3?'手紙を届けよう':`${target.floor===current.floor?'':target.floor+'・'}${shortNames[target.id]}へ`;compactGoal.title=progress.delivered?'手紙を届けました':`${target.floor} · ${target.title}`;const signature=JSON.stringify([progress,selectedAvatar,team?.code,team?.members?.map(m=>[m.id,m.online,m.avatarId]),networkError]);
     if(signature!==lastHud){lastHud=signature;traveler.replaceChildren(portrait(selectedAvatar),make('span','',avatarById(selectedAvatar).name+' · 姿を選ぶ'));objective.textContent=progress.delivered?'手紙を届けました':progress.stage===3?'宛先の戻った手紙を届けよう':`${target.floor} · ${target.title}へ`;
       progressRow.replaceChildren();for(let i=0;i<3;i++){const stamp=make('span','tg-stamp');stamp.classList.toggle('is-found',progress.stage>i);stamp.append(ticketIcon(SPOTS[i].id),make('small','',progress.stage>i?'✓':String(i+1)));progressRow.append(stamp);}status.textContent=team?(networkError?'再接続を待っています':`合言葉 ${team.code} · ${team.members?.filter(m=>m.online).length??1}/4人`):'1人で探索中';}
     const membersSignature=JSON.stringify(team?.members?.map(m=>[m.id,m.name,m.online,m.avatarId]));if(lastMembers!==membersSignature){lastMembers=membersSignature;memberList.replaceChildren();for(const member of team?.members??[]){const m=make('span','',member.name+(member.id===team.selfId?'（あなた）':''));m.style.opacity=member.online?'1':'.5';m.prepend(portrait(memberAvatar(member).id));memberList.append(m);}}
@@ -203,7 +223,7 @@ export function createTicketEpisode(api){
   }
   on(scrim,'click',close);on(document,'keydown',event=>{if(!dialog)return;if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();close();return;}if(event.key==='Tab'){const elements=[...panel.querySelectorAll('button:not([disabled]),input:not([disabled]),a[href]')].filter(e=>!e.closest('[hidden]'));const first=elements[0],last=elements.at(-1);if(event.shiftKey&&(document.activeElement===first||document.activeElement===panel)){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}},true);
   function update(dt){if(disposed)return;avatarPreview?.update(dt);updateSelfAvatar(dt);updatePeers(dt);lastTick+=dt;if(lastTick>.12){lastTick=0;refresh();}if(team&&playing&&!document.hidden&&performance.now()-lastPoll>1500&&!syncing){lastPoll=performance.now();void sync().catch(()=>{});}}
-  function dispose(){close();disposed=true;selfRequest++;selfActor?.dispose();selfActor=null;listeners.forEach(fn=>fn());clearPeers();root.remove();launch.remove();resume.remove();}
+  function dispose(){close();disposed=true;selfRequest++;selfActor?.dispose();selfActor=null;listeners.forEach(fn=>fn());clearPeers();root.remove();launch.remove();resume.remove();if(embedded)delete document.body.dataset.ticketEmbedded;}
   refresh();if(new URLSearchParams(location.search).has('room'))open('team');
   return {update,close,dispose,get shoulderView(){return playing;}};
 }
