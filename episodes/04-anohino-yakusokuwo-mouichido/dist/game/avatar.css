@@ -1,0 +1,30 @@
+#ticket-game .tg-avatar-picker { margin: 20px 0; padding: 15px; background: #fffdf55e; border: 1px solid #c5cbb8; border-radius: 6px; }
+#ticket-game .tg-avatar-picker h3 { margin: 0; text-align: center; font-size: 13px; letter-spacing: .1em; font-weight: 500; }
+#ticket-game .tg-avatar-preview { position: relative; width: 100%; height: 190px; background: radial-gradient(ellipse at 50% 85%, #dfd9b755, transparent 55%); }
+#ticket-game .tg-avatar-preview canvas { display: block; width: 100%; height: 100%; }
+#ticket-game .tg-avatar-preview [role='status'] { position: absolute; inset: auto 0 0; text-align: center; font-size: 10px; color: #6e7965; pointer-events: none; }
+#ticket-game .tg-avatar-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; }
+#ticket-game .tg-avatar-choice { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 9px 4px; min-width: 0; background: #fffdf5; border: 1px solid #c5cbb8; border-bottom: 3px solid var(--avatar-color); border-radius: 5px; cursor: pointer; font-size: 11px; line-height: 1.5; }
+#ticket-game .tg-avatar-choice[aria-pressed='true'] { border-color: var(--avatar-color); box-shadow: 0 0 0 2px var(--avatar-color); background: #f0f0df; }
+#ticket-game .tg-avatar-choice small { color: #6f7d68; font-size: 9px; }
+#ticket-game .tg-avatar-choice .tg-avatar-portrait { width: 42px; height: 56px; }
+#ticket-game .tg-avatar-portrait { display: inline-block; flex-shrink: 0; width: 24px; height: 32px; background-image: url('./avatars/portraits.png'); background-size: 400% 100%; background-repeat: no-repeat; image-rendering: auto; }
+#ticket-game .tg-avatar-selection { margin: 11px 0 0; color: #5d715c; text-align: center; font-size: 10px; }
+#ticket-game .tg-traveler { display: flex; align-items: center; gap: 9px; width: 100%; margin-top: 11px; padding: 6px 8px; color: #3b5848; background: #e6e9db; border: 1px solid #c4ccb5; border-radius: 4px; font-size: 10px; cursor: pointer; }
+#ticket-game .tg-members > span, #ticket-game .tg-avatar-member { display: inline-flex; align-items: center; gap: 5px; }
+#ticket-game .tg-members .tg-avatar-portrait { width: 18px; height: 24px; }
+#ticket-game .tg-avatar-member { margin: 0; }
+@media(max-width:600px) {
+  #ticket-game .tg-avatar-picker { padding: 12px 9px; margin: 15px 0; }
+  #ticket-game .tg-avatar-preview { height: 164px; }
+  #ticket-game .tg-avatar-grid { gap: 6px; }
+  #ticket-game .tg-avatar-choice { font-size: 9px; padding: 8px 2px; }
+  #ticket-game .tg-avatar-choice small { font-size: 8px; }
+  #ticket-game .tg-avatar-choice .tg-avatar-portrait { width: 33px; height: 44px; }
+  #ticket-game .tg-traveler { margin-top: 7px; padding: 3px 5px; font-size: 8px; }
+  #ticket-game .tg-traveler .tg-avatar-portrait { width: 18px; height: 24px; }
+  body[data-ticket-playing='true'] .movement-picker { top: auto; bottom: calc(204px + env(safe-area-inset-bottom,0px)); }
+}
+@media(max-height:710px) and (max-width:600px) {
+  body[data-ticket-playing='true'] .movement-picker { bottom: calc(190px + env(safe-area-inset-bottom,0px)); }
+}

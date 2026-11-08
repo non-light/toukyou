@@ -1,0 +1,32 @@
+#ticket-resume{display:none!important}
+.welcome h1{font-size:clamp(27px,3.3vw,48px);line-height:1.35;letter-spacing:.025em}
+.welcome .primary{margin-top:9px;min-height:44px}
+.welcome .story-first-launch{background:transparent;color:var(--ink,#ece8dc);border:1px solid #b9c8bf88;box-shadow:none}
+.stories-scrim{position:fixed;inset:0;z-index:170;background:#081918bb;backdrop-filter:blur(8px)}
+.stories-panel{position:fixed;z-index:171;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:min(600px,calc(100% - 24px));max-height:calc(100dvh - 32px);overflow:auto;padding:28px;background:#f8f5ee;color:#273e3c;border:1px solid #d4d6ca;border-radius:24px;box-shadow:0 24px 100px #001b1b70;font-family:inherit}
+.stories-panel[hidden],.stories-scrim[hidden]{display:none}
+.stories-panel header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.stories-panel h2{margin:8px 0;font-size:25px}
+.stories-panel p{font-size:14px;line-height:1.85}
+.stories-panel small{font-size:12px;color:#627571}
+.stories-close{border:1px solid #b7c4bb;background:transparent;color:inherit;border-radius:50%;width:44px;height:44px;font-size:24px;flex:none}
+.story-card{display:flex;flex-direction:column;gap:10px;text-align:left;width:100%;font:inherit;color:inherit;background:#fffdf8;border:1px solid #bdc9be;border-radius:16px;padding:20px;margin-top:16px;cursor:pointer}
+.story-card[data-story="farewell"]{border-color:#8e7760;background:#f3eadc}
+.story-card strong{font-size:clamp(18px,2.5vw,22px);line-height:1.65;letter-spacing:.03em}
+.story-card span{font-size:13px;line-height:1.8}
+.story-card:hover{background:#e5ebe3}
+.stories-panel button:focus-visible{outline:3px solid #b17d42;outline-offset:4px}
+@media(max-width:600px){.stories-panel{padding:20px;border-radius:18px}.story-card{padding:16px}.welcome{max-height:calc(100dvh - 160px);overflow:auto}.welcome h1{font-size:26px}.welcome p{font-size:12px}.welcome .welcome-note{font-size:10px}.welcome .primary{font-size:12px;padding:11px 12px}}
+
+.story-card[data-story='photograph']{border-color:#978369;background:#ede8dc}
+.story-card[data-story='promise']{border-color:#9b7b71;background:#f3e9e2}
+.welcome #farewell-start{background:transparent;color:var(--ink,#ece8dc);border:1px solid #b9c8bf88;box-shadow:none}
+
+/* Keep full story names readable when a launch button wraps on a phone. */
+.welcome .primary{white-space:normal;text-align:left;justify-content:flex-start;line-height:1.65;letter-spacing:.02em}
+
+.welcome .story-later-launch{background:transparent;color:var(--ink,#ece8dc);border:1px solid #b9c8bf88;box-shadow:none}
+
+/* Four story launch buttons remain reachable on short screens. */
+.welcome{max-height:calc(100dvh - 150px);overflow-y:auto;overscroll-behavior:contain}
+.story-card[data-story='promise']{border-color:#ab8d65;background:#f4ead8}
