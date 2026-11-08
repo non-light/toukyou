@@ -1,0 +1,17 @@
+{
+  "name": "tokyo-station-episode-01",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "時を超えた一通",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node scripts/dev-game.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "CHECK_SCENE=1 CHECK_BUILDING_SCENE=1 node --test tests/*.test.mjs",
+    "build": "node scripts/check.mjs && node scripts/build-game.mjs",
+    "setup": "npm --prefix server-app ci"
+  }
+}

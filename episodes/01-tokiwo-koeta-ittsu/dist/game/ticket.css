@@ -1,0 +1,456 @@
+/* The ticket is a separate game overlay. Station models and walking stay intact. */
+#ticket-game {
+  --tg-ink: #243e39;
+  --tg-deep: #17332f;
+  --tg-paper: #f6efdd;
+  --tg-gold: #dbc18a;
+  --tg-muted: #65766b;
+  --tg-rule: #bca98545;
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+  color: var(--tg-ink);
+  font: 14px/1.8 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+#ticket-game [hidden] { display: none !important; }
+#ticket-game:has(.tg-panel:not([hidden])) { z-index: 80; }
+#ticket-game:has(.tg-lens:not([hidden])) .tg-hud { opacity: 0; pointer-events: none; }
+#ticket-game *, #ticket-game *::before, #ticket-game *::after { box-sizing: border-box; }
+#ticket-game button, #ticket-game input, #ticket-game select { font: inherit; }
+#ticket-game button { color: inherit; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+#ticket-game button:focus-visible, #ticket-game a:focus-visible, #ticket-game input:focus-visible,
+#ticket-game select:focus-visible, #ticket-game [tabindex]:focus-visible {
+  outline: 3px solid #b99850;
+  outline-offset: 4px;
+}
+#ticket-game button:disabled { cursor: default; opacity: .48; }
+#ticket-game button:hover { filter: none; }
+#ticket-game p { margin: 0 0 15px; }
+#ticket-game strong { font-weight: 600; }
+#ticket-game svg { vertical-align: middle; }
+#ticket-game .tg-hud {
+  position: absolute;
+  top: 348px;
+  right: 34px;
+  width: 292px;
+  padding: 18px 19px 16px;
+  pointer-events: auto;
+  background: #f8f2e4f5;
+  border: 1px solid #fff9;
+  border-radius: 5px;
+  box-shadow: 0 9px 30px #142b261c;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+#ticket-game .tg-hud::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 3px; background: #b7985e; }
+#ticket-game .tg-eyebrow { display: block; margin-bottom: 8px; color: #81704d; font-size: 9px; font-weight: 600; letter-spacing: .16em; line-height: 1.6; }
+#ticket-game .tg-hud h2, #ticket-game .tg-hud h3 { margin: 0 0 8px; font-size: 14px; font-weight: 500; line-height: 1.7; }
+#ticket-game .tg-hud p { margin: 0 0 10px; color: #5a6c60; font-size: 11px; line-height: 1.9; }
+#ticket-game .tg-hud small { color: #7f8574; font-size: 10px; }
+#ticket-game .tg-hud > strong { display: block; font-size: 13px; line-height: 1.8; font-weight: 500; }
+#ticket-game .tg-hud > .tg-eyebrow { margin-bottom: 7px; color: #81704d; font-size: 9px; letter-spacing: .12em; }
+#ticket-game .tg-hud .tg-room { display: block; margin: 0 0 9px; padding: 0; border: 0; font-size: 9px; }
+#ticket-game .tg-hud .tg-members { gap: 4px; margin: 5px 0 9px; font-size: 9px; }
+#ticket-game .tg-members:empty { display: none; }
+#ticket-game .tg-progress { display: flex; align-items: center; gap: 8px; margin: 11px 0 14px; color: #69755e; font-size: 10px; }
+#ticket-game .tg-progress > span { flex: 1; border-bottom: 3px solid #d9dccb; padding-bottom: 5px; text-align: center; }
+#ticket-game .tg-progress > span.done, #ticket-game .tg-progress > span.is-done,
+#ticket-game .tg-progress > span[aria-current='step'] { color: #315647; border-color: #8c9f73; }
+#ticket-game .tg-actions, #ticket-game .tg-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+#ticket-game .tg-actions > *, #ticket-game .tg-toolbar > * { flex: 1; }
+#ticket-game .tg-toolbar { position: absolute; right: 34px; bottom: 133px; min-width: 176px; flex-direction: column; align-items: stretch; gap: 9px; pointer-events: auto; }
+#ticket-game .tg-toolbar > * { flex: 0 0 auto; }
+#ticket-game .tg-toolbar > .tg-floating { position: static; width: 100%; min-width: 0; }
+#ticket-game .tg-toolbar .tg-icon, #ticket-game .tg-toolbar > .tg-floating > .tg-icon { display: inline-flex; width: 24px; height: 24px; margin: 0; padding: 0; border: 0; border-radius: 0; color: inherit; }
+#ticket-game .tg-toolbar .tg-icon svg, #ticket-game .tg-toolbar > .tg-floating > .tg-icon svg { width: 22px; height: 22px; }
+#ticket-game .tg-primary, #ticket-game .tg-secondary {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 11px 19px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  text-decoration: none;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+  transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
+  pointer-events: auto;
+}
+#ticket-game .tg-primary { background: #254d43; border-color: #254d43; color: #fff8e9; box-shadow: 0 3px 9px #1b3d2910; }
+#ticket-game .tg-primary:hover:not(:disabled) { background: #356456; border-color: #356456; box-shadow: 0 4px 15px #1b3d2922; }
+#ticket-game .tg-primary:active:not(:disabled), #ticket-game .tg-secondary:active:not(:disabled) { transform: translateY(1px); }
+#ticket-game .tg-secondary { background: #fffdf530; border-color: #bac3ad; color: #4b6254; }
+#ticket-game .tg-secondary:hover:not(:disabled) { background: #e7ebdf; }
+#ticket-game .tg-hud .tg-primary, #ticket-game .tg-hud .tg-secondary { padding: 8px 10px; min-height: 36px; font-size: 10px; }
+#ticket-game .tg-lens {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: min(680px, 86vw);
+  height: 306px;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-rows: 47px 1fr 43px;
+  border: 9px solid var(--tg-paper);
+  border-radius: 7px;
+  background: none;
+  box-shadow: 0 0 0 1px #dacda7, 0 18px 70px #132d3447;
+  pointer-events: none;
+  animation: tg-ticket-appear .45s ease both;
+}
+#ticket-game .tg-lens::before, #ticket-game .tg-lens::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  bottom: -9px;
+  width: 14px;
+  background: var(--tg-paper);
+  z-index: 1;
+}
+#ticket-game .tg-lens::before { left: -8px; border-right: 1px dashed #a991603f; }
+#ticket-game .tg-lens::after { right: -8px; border-left: 1px dashed #a991603f; }
+#ticket-game .tg-lens-head, #ticket-game .tg-lens-foot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 24px;
+  background: var(--tg-paper);
+  color: #776845;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+#ticket-game .tg-lens-head { border-bottom: 1px solid #b6a07944; }
+#ticket-game .tg-lens-head strong { color: #3b4e3a; font: 500 17px/1.5 'Noto Serif JP', serif; letter-spacing: .16em; }
+#ticket-game .tg-lens-foot { border-top: 1px solid #b6a07944; font-size: 9px; }
+#ticket-game .tg-lens-window {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 22px 30px;
+  border-right: 18px solid var(--tg-paper);
+  border-left: 18px solid var(--tg-paper);
+  background: linear-gradient(135deg, #163d3435, #0c252d42);
+  box-shadow: inset 0 0 35px #112d272e;
+}
+#ticket-game .tg-lens-window::before { content: ''; position: absolute; inset: 12px; border: 1px solid #edd2a226; pointer-events: none; }
+#ticket-game .tg-ghost {
+  position: relative;
+  max-width: 100%;
+  margin: 0;
+  color: #ffedb9;
+  text-align: center;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  font: 500 clamp(17px, 1.8vw, 21px)/1.75 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  letter-spacing: .11em;
+  text-shadow: 0 0 8px #eac47a99, 0 1px 5px #1a3d2e, 0 0 28px #f6ce6d66;
+  animation: tg-ink-appear .65s ease both;
+}
+#ticket-game .tg-ghost small { display: block; margin-top: 8px; color: #f8e9bd; font: 11px/1.8 'Noto Sans JP', sans-serif; letter-spacing: .04em; }
+#ticket-game .tg-ghost > .tg-icon { display: flex; width: 34px; height: 34px; margin: 0 auto 9px; border: 0; color: #ffedb9; }
+#ticket-game .tg-ghost > .tg-icon svg { width: 29px; height: 29px; filter: drop-shadow(0 0 6px #e8c87a77); }
+#ticket-game .tg-ghost p { margin: 0; font: inherit; color: inherit; line-height: inherit; }
+#ticket-game .tg-prompt {
+  position: absolute;
+  bottom: 209px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(430px, 85vw);
+  padding: 10px 18px;
+  border: 1px solid #e0cc945e;
+  border-radius: 5px;
+  background: #193d35e8;
+  color: #fbefd0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.9;
+  box-shadow: 0 5px 30px #122e2b25;
+}
+#ticket-game .tg-prompt button { pointer-events: auto; color: #ffebb1; text-decoration: underline; text-underline-offset: 4px; }
+#ticket-game .tg-floating {
+  position: absolute;
+  right: 34px;
+  bottom: 133px;
+  min-width: 176px;
+  min-height: 58px;
+  padding: 13px 23px;
+  border: 1px solid #dec995;
+  border-radius: 5px;
+  background: #f5e4b9;
+  box-shadow: 0 6px 22px #1d392b22, inset 0 0 0 4px #f5e4b9, inset 0 0 0 5px #c8b38166;
+  color: #314f3d;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .03em;
+  pointer-events: auto;
+  transition: background .2s ease, box-shadow .2s ease;
+}
+#ticket-game .tg-floating:hover { background: #ffedc5; }
+#ticket-game .tg-floating.is-ready, #ticket-game .tg-floating.ready { animation: tg-ready 2.6s ease-in-out infinite; }
+#ticket-game .tg-floating[aria-pressed='true'] { color: #fff6dc; background: #254d43; border-color: #bfa66d; box-shadow: 0 4px 22px #102d3329, inset 0 0 0 4px #254d43, inset 0 0 0 5px #bda16c66; }
+#ticket-game .tg-scrim { position: absolute; inset: 0; z-index: 30; background: #0b262668; backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px); pointer-events: auto; }
+#ticket-game .tg-panel {
+  position: absolute;
+  z-index: 31;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(580px, calc(100vw - 40px));
+  max-height: calc(100dvh - 64px);
+  padding: 32px 35px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b1bda2 #f2eedf;
+  pointer-events: auto;
+  color: var(--tg-ink);
+  background: var(--tg-paper);
+  border: 1px solid #fff8;
+  border-radius: 8px;
+  box-shadow: 0 18px 90px #071e234a;
+  animation: tg-panel-appear .23s ease both;
+}
+#ticket-game .tg-panel::after { content: ''; position: absolute; left: 13px; right: 13px; top: 13px; height: 0; border-top: 1px solid var(--tg-rule); pointer-events: none; }
+#ticket-game .tg-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; }
+#ticket-game .tg-panel-head > div { min-width: 0; }
+#ticket-game .tg-close { position: absolute; top: 17px; right: 17px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #647d6810; color: #65765f; font: 26px/1 sans-serif; }
+#ticket-game .tg-close:hover { background: #647d6826; }
+#ticket-game .tg-title { margin: 9px 35px 18px 0; font: 500 28px/1.6 'Noto Serif JP', 'Hiragino Mincho ProN', serif; color: #28493e; letter-spacing: .04em; }
+#ticket-game .tg-lead { font-size: 14px; line-height: 2.1; color: #4b6254; white-space: pre-line; }
+#ticket-game .tg-note { margin: 15px 0; color: #7e846f; font-size: 11px; line-height: 1.9; }
+#ticket-game .tg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 22px 0; }
+#ticket-game .tg-card { position: relative; padding: 19px 13px; text-align: center; border: 1px solid #c8cdb8; border-radius: 5px; background: #fffef641; font-size: 12px; }
+#ticket-game .tg-card h3, #ticket-game .tg-card strong { margin: 0 0 5px; display: block; font-size: 12px; font-weight: 500; }
+#ticket-game .tg-card p, #ticket-game .tg-card small { margin: 4px 0 0; font-size: 10px; line-height: 1.8; color: #7d846c; }
+#ticket-game .tg-icon { display: inline-grid; place-items: center; width: 57px; height: 57px; margin: 0 auto 10px; border: 1px solid #c5ba9577; border-radius: 50%; color: #70856a; font: 30px/1 'Noto Serif JP', serif; }
+#ticket-game .tg-icon svg { width: 31px; height: 31px; }
+#ticket-game .tg-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 22px 0 15px; }
+#ticket-game .tg-option { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 9px; min-height: 115px; padding: 17px 10px; color: #536c55; background: #fffef455; border: 1px solid #c2c9b2; border-radius: 5px; font-size: 12px; line-height: 1.8; transition: background .15s ease, border-color .15s ease, transform .15s ease; }
+#ticket-game .tg-option:hover:not(:disabled) { background: #e5e9d8; border-color: #7e976a; transform: translateY(-2px); }
+#ticket-game .tg-option.selected, #ticket-game .tg-option[aria-pressed='true'] { background: #e4e9d4; border-color: #67835c; box-shadow: inset 0 0 0 1px #67835c; }
+#ticket-game .tg-option .tg-icon { width: 46px; height: 46px; margin-bottom: 0; font-size: 26px; }
+#ticket-game .tg-stamps { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 17px; margin: 24px 0; }
+#ticket-game .tg-stamp { display: grid; place-items: center; width: 72px; height: 72px; padding: 7px; border: 2px solid #a3ad944f; border-radius: 50%; color: #9ba68a; font-size: 12px; text-align: center; line-height: 1.7; transform: rotate(-5deg); }
+#ticket-game .tg-stamp.done, #ticket-game .tg-stamp.is-done { color: #6d8660; border-color: #81996b; box-shadow: inset 0 0 0 3px var(--tg-paper), inset 0 0 0 4px #81996b70; }
+#ticket-game .tg-hud .tg-progress > .tg-stamp { display: flex; align-items: center; justify-content: center; gap: 7px; width: auto; height: 36px; min-height: 0; padding: 4px; transform: none; border: 1px solid #b3bba177; border-radius: 3px; color: #9aa58c; }
+#ticket-game .tg-hud .tg-progress > .tg-stamp.is-found { color: #4d734a; border-color: #879c71; background: #e6ead9; box-shadow: none; }
+#ticket-game .tg-hud .tg-stamp > .tg-icon { display: inline-flex; width: 21px; height: 21px; padding: 0; margin: 0; border: 0; border-radius: 0; color: inherit; }
+#ticket-game .tg-hud .tg-stamp > .tg-icon svg { width: 20px; height: 20px; }
+#ticket-game .tg-hud .tg-stamp small { color: inherit; font: 10px/1 Georgia, serif; }
+#ticket-game .tg-sequence { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 24px 0 20px; }
+#ticket-game .tg-slot { position: relative; display: flex; flex: 1 1 0; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-width: 0; min-height: 100px; padding: 7px 3px; border: 1px dashed #b5bca5; border-radius: 5px; background: #fffdf544; color: #546b50; font-size: 13px; text-align: center; }
+#ticket-game .tg-slot small { color: #9ca68c; font: 10px/1.5 Georgia, serif; letter-spacing: .1em; }
+#ticket-game .tg-slot.filled { border-style: solid; background: #e7ecd9; }
+#ticket-game .tg-slot .tg-icon { width: 30px; height: 30px; margin: 0; border: 0; }
+#ticket-game .tg-slot .tg-icon svg { width: 28px; height: 28px; }
+#ticket-game .tg-slot > span:last-child:not(.tg-icon) { width: 100%; max-width: 105px; padding: 0 4px; overflow-wrap: anywhere; font-size: 10px; line-height: 1.6; }
+#ticket-game .tg-feedback { margin: 14px 0; padding: 12px 15px; border-left: 3px solid #b79d64; background: #e8dec221; color: #6a7355; font-size: 12px; line-height: 1.9; }
+#ticket-game .tg-feedback.is-error { border-color: #bd947a; color: #93654d; background: #f2ded840; }
+#ticket-game .tg-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--tg-rule); color: #8b8c76; font-size: 10px; }
+#ticket-game .tg-footer a { text-underline-offset: 4px; }
+#ticket-game .tg-room { padding: 18px 0 0; margin-top: 22px; border-top: 1px solid var(--tg-rule); }
+#ticket-game .tg-room label { display: block; font-size: 12px; color: #6f7f69; }
+#ticket-game .tg-room input, #ticket-game .tg-room select { width: 100%; min-width: 0; min-height: 44px; margin: 7px 0 12px; padding: 10px 13px; color: #294c3c; background: #fffdf7; border: 1px solid #b7c1a7; border-radius: 4px; }
+#ticket-game .tg-room input::placeholder { color: #98a28d; }
+#ticket-game .tg-panel form { display: grid; gap: 13px; margin: 20px 0; }
+#ticket-game .tg-panel form > label { display: block; text-align: left; font-size: 11px; color: #6f7f69; }
+#ticket-game .tg-panel input, #ticket-game .tg-panel select { display: block; width: 100%; min-width: 0; min-height: 44px; margin: 8px 0 0; padding: 10px 12px; color: #294c3c; background: #fffdf7; border: 1px solid #b7c1a7; border-radius: 4px; font: 13px/1.6 'Noto Sans JP', sans-serif; }
+#ticket-game .tg-panel input::placeholder { color: #98a28d; }
+#ticket-game .tg-panel input[name='room'] { font-family: Georgia, serif; font-size: 18px; letter-spacing: .15em; text-transform: uppercase; }
+#ticket-game .tg-members { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 10px 0; font-size: 11px; }
+#ticket-game .tg-members > span { padding: 4px 9px; border-radius: 3px; background: #dfe7d3; color: #607c52; }
+#ticket-game .tg-members > p { margin: 0; padding: 5px 9px; border-radius: 3px; background: #dfe7d3; color: #607c52; }
+#ticket-game .tg-peer { position: absolute; transform: translate(-50%, -100%); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 5px 10px; border: 1px solid #e3cf9777; border-radius: 4px; color: #f8edce; background: #254f43d9; box-shadow: 0 3px 12px #16372e22; font-size: 10px; line-height: 1.7; pointer-events: none; }
+#ticket-game .tg-invitation { margin: 14px 0; padding: 13px 16px; border: 1px dashed #b7b994; border-radius: 4px; background: #fffdf33b; font-size: 12px; overflow-wrap: anywhere; }
+#ticket-game .tg-invitation strong { display: block; margin: 5px 0; font: 22px/1.5 Georgia, serif; letter-spacing: .18em; color: #546948; }
+#ticket-game .tg-invitation { text-align: center; }
+#ticket-game .tg-invitation > .tg-icon { margin: 0 10px; vertical-align: middle; }
+#ticket-game .tg-invitation > span:not(.tg-icon) { display: inline-block; vertical-align: middle; }
+#ticket-game .tg-panel > .tg-card { margin: 14px 0; text-align: left; }
+#ticket-game .tg-panel > .tg-card > .tg-icon { float: right; margin: 0 0 8px 14px; }
+#ticket-game .tg-panel > .tg-card::after { content: ''; display: block; clear: both; }
+#ticket-game .tg-panel > .tg-card p { white-space: pre-line; }
+#ticket-game .tg-ending { text-align: center; padding: 12px 0 5px; }
+#ticket-game .tg-ending .tg-title { margin-right: 0; }
+#ticket-game .tg-ending > strong { display: block; margin: 13px 0; color: #876f55; font: 500 28px/1.6 'Noto Serif JP', serif; letter-spacing: .16em; }
+#ticket-game .tg-ending > p { color: #8b8469; font-family: 'Noto Serif JP', serif; }
+#ticket-game .tg-ending .tg-stamp { width: 100px; height: 100px; margin: 24px auto; color: #8c7660; border-color: #ac947b; font: 500 18px/1.6 'Noto Serif JP', serif; box-shadow: inset 0 0 0 4px var(--tg-paper), inset 0 0 0 5px #ac947b80; transform: rotate(-11deg); }
+#ticket-game .tg-start { position: absolute; left: 60px; top: 195px; width: min(445px, calc(100vw - 80px)); padding: 32px 34px 26px; border: 1px solid #fff9; border-radius: 6px; background: #f8f1e1f5; box-shadow: 0 14px 60px #15372a1f; pointer-events: auto; }
+#ticket-game .tg-start::before { content: ''; position: absolute; left: 14px; top: 14px; bottom: 14px; width: 3px; border-left: 1px solid #b5a4734f; border-right: 1px solid #b5a4734f; }
+#ticket-game .tg-start .tg-eyebrow { font-size: 9px; letter-spacing: .19em; }
+#ticket-game .tg-start .tg-title { font-size: 39px; line-height: 1.65; margin: 16px 0 16px; letter-spacing: .055em; }
+#ticket-game .tg-start .tg-lead { font-size: 12px; line-height: 2.1; }
+#ticket-game .tg-start .tg-actions { margin-top: 22px; }
+#ticket-game .tg-start .tg-primary { flex: 1 1 100%; min-height: 49px; }
+#ticket-game .tg-start .tg-secondary { font-size: 11px; }
+#ticket-game .tg-start .tg-note { font-size: 10px; margin: 15px 0 0; }
+
+#ticket-start { justify-content: flex-start; gap: 12px; margin-bottom: 10px; background: #294f43; color: #fff4d6; }
+#ticket-start .tg-icon, #ticket-resume .tg-icon { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 24px; height: 24px; margin: 0; border: 0; color: inherit; }
+#ticket-start .tg-icon svg { width: 23px; height: 23px; }
+#ticket-resume .tg-icon, #ticket-resume .tg-icon svg { width: 18px; height: 18px; }
+#welcome:has(#ticket-start) > #start { justify-content: center; gap: 10px; padding: 11px 16px; color: #6a765b; background: transparent; border: 1px solid #cbd2be; font-size: 10px; }
+
+body[data-ticket-playing='true'] .welcome,
+body[data-ticket-playing='true'] #hotspots,
+body[data-ticket-playing='true'] .walk-stats,
+body[data-ticket-playing='true'] .view-tools,
+body[data-ticket-playing='true'] .play-shortcuts,
+body[data-ticket-playing='true'] .play-place-nav,
+body[data-ticket-playing='true'] .play-route-note,
+body[data-ticket-playing='true'] .selected-route,
+body[data-ticket-playing='true'] .bottom-hint,
+body[data-ticket-playing='true'] .tour-status,
+body[data-ticket-playing='true'] .game-interactions { display: none !important; }
+body[data-ticket-playing='true'] .mini-map { z-index: 2; }
+body[data-ticket-playing='true'] .bottom-nav { z-index: 14; }
+body[data-ticket-playing='true'] .panel, body[data-ticket-playing='true'] .scrim { z-index: 25; }
+body[data-ticket-playing='true'] .model-footer { opacity: .75; }
+
+@keyframes tg-ticket-appear { from { opacity: 0; margin-top: 13px; } to { opacity: 1; margin-top: 0; } }
+@keyframes tg-ink-appear { from { opacity: 0; filter: blur(4px); } to { opacity: 1; filter: blur(0); } }
+@keyframes tg-panel-appear { from { opacity: 0; margin-top: 7px; } to { opacity: 1; margin-top: 0; } }
+@keyframes tg-ready { 0%, 100% { box-shadow: 0 0 0 0 #ead08b00, 0 6px 22px #1d392b22; } 50% { box-shadow: 0 0 0 6px #ead08b25, 0 6px 27px #dbbd7066; } }
+
+@media (min-width: 1400px) {
+  #ticket-game .tg-hud, #ticket-game .tg-floating { right: 44px; }
+  #ticket-game .tg-toolbar { right: 44px; }
+  #ticket-game .tg-start { left: 75px; }
+}
+@media (max-width: 1050px) and (min-width: 601px) {
+  #ticket-game .tg-hud { right: 25px; width: 256px; top: 341px; padding: 15px; }
+  #ticket-game .tg-floating { right: 25px; min-width: 164px; }
+  #ticket-game .tg-toolbar { right: 25px; min-width: 164px; }
+  #ticket-game .tg-start { left: 40px; width: 390px; padding: 28px 31px 23px; }
+  #ticket-game .tg-start .tg-title { font-size: 35px; }
+  #ticket-game .tg-lens { width: min(590px, 79vw); top: 47%; }
+}
+@media (max-width: 600px) {
+  #ticket-game { font-size: 13px; }
+  #ticket-game .tg-hud { top: calc(170px + env(safe-area-inset-top, 0px)); left: 16px; right: 153px; width: auto; padding: 11px 12px 10px; border-radius: 4px; }
+  #ticket-game .tg-hud .tg-eyebrow { font-size: 7px; margin-bottom: 4px; letter-spacing: .1em; }
+  #ticket-game .tg-hud h2, #ticket-game .tg-hud h3 { font-size: 11px; margin-bottom: 5px; }
+  #ticket-game .tg-hud > strong { font-size: 10px; line-height: 1.7; }
+  #ticket-game .tg-hud .tg-room { margin: 0 0 5px; font-size: 8px; }
+  #ticket-game .tg-hud .tg-members { font-size: 8px; gap: 3px; margin: 4px 0 5px; }
+  #ticket-game .tg-hud .tg-members > span { padding: 2px 5px; }
+  #ticket-game .tg-hud p { font-size: 9px; line-height: 1.8; margin-bottom: 5px; }
+  #ticket-game .tg-hud small { font-size: 8px; }
+  #ticket-game .tg-hud .tg-primary, #ticket-game .tg-hud .tg-secondary { min-height: 30px; padding: 5px 7px; font-size: 9px; }
+  #ticket-game .tg-hud .tg-actions { gap: 5px; }
+  #ticket-game:has(.tg-lens:not([hidden])) .tg-hud p { display: none; }
+  #ticket-game .tg-progress { margin: 5px 0 8px; gap: 4px; font-size: 8px; }
+  #ticket-game .tg-progress > span { padding-bottom: 2px; border-bottom-width: 2px; }
+  #ticket-game .tg-hud .tg-progress > .tg-stamp { height: 25px; gap: 4px; padding: 2px; }
+  #ticket-game .tg-hud .tg-stamp > .tg-icon, #ticket-game .tg-hud .tg-stamp > .tg-icon svg { width: 16px; height: 16px; }
+  #ticket-game .tg-hud .tg-stamp small { font-size: 8px; }
+  #ticket-game .tg-lens { top: 51%; width: calc(100vw - 32px); height: 280px; grid-template-rows: 39px 1fr 34px; border-width: 7px; border-radius: 5px; }
+  #ticket-game .tg-lens::before, #ticket-game .tg-lens::after { top: -7px; bottom: -7px; width: 11px; }
+  #ticket-game .tg-lens::before { left: -6px; }
+  #ticket-game .tg-lens::after { right: -6px; }
+  #ticket-game .tg-lens-head, #ticket-game .tg-lens-foot { padding: 0 14px; font-size: 8px; letter-spacing: .07em; gap: 8px; }
+  #ticket-game .tg-lens-head strong { font-size: 14px; }
+  #ticket-game .tg-lens-foot { font-size: 7px; }
+  #ticket-game .tg-lens-window { border-left-width: 10px; border-right-width: 10px; padding: 14px 16px; }
+  #ticket-game .tg-lens-window::before { inset: 8px; }
+  #ticket-game .tg-ghost { font-size: 17px; letter-spacing: .055em; line-height: 1.95; }
+  #ticket-game .tg-ghost small { font-size: 9px; margin-top: 6px; }
+  #ticket-game .tg-ghost { font-size: 14px; line-height: 1.85; }
+  #ticket-game .tg-ghost > .tg-icon { width: 27px; height: 27px; margin-bottom: 7px; }
+  #ticket-game .tg-ghost > .tg-icon svg { width: 25px; height: 25px; }
+  #ticket-game:has(.tg-lens:not([hidden])) .tg-hud { opacity: 0; pointer-events: none; }
+  #ticket-game .tg-prompt { bottom: calc(249px + env(safe-area-inset-bottom, 0px)); max-width: calc(100vw - 38px); padding: 9px 13px; font-size: 10px; }
+  #ticket-game .tg-floating { right: 16px; bottom: calc(94px + env(safe-area-inset-bottom, 0px)); min-width: 153px; min-height: 52px; font-size: 11px; padding: 12px 17px; }
+  #ticket-game .tg-toolbar { right: 16px; bottom: calc(94px + env(safe-area-inset-bottom, 0px)); min-width: 153px; max-width: calc(100vw - 160px); gap: 7px; }
+  #ticket-game .tg-toolbar > .tg-floating { min-width: 0; }
+  #ticket-game .tg-panel { width: calc(100vw - 28px); max-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); padding: 29px 22px 23px; border-radius: 6px; }
+  #ticket-game .tg-close { top: 13px; right: 12px; width: 36px; height: 36px; font-size: 24px; }
+  #ticket-game .tg-title { font-size: 24px; margin: 8px 28px 16px 0; }
+  #ticket-game .tg-lead { font-size: 12px; line-height: 2; }
+  #ticket-game .tg-note { font-size: 10px; }
+  #ticket-game .tg-grid { gap: 7px; margin: 18px 0; }
+  #ticket-game .tg-card { padding: 15px 7px; font-size: 10px; }
+  #ticket-game .tg-card h3, #ticket-game .tg-card strong { font-size: 10px; }
+  #ticket-game .tg-card p, #ticket-game .tg-card small { font-size: 8px; }
+  #ticket-game .tg-icon { width: 45px; height: 45px; font-size: 25px; }
+  #ticket-game .tg-options { gap: 8px; margin: 19px 0 13px; }
+  #ticket-game .tg-option { min-height: 103px; gap: 7px; padding: 13px 6px; font-size: 10px; }
+  #ticket-game .tg-option .tg-icon { width: 39px; height: 39px; font-size: 23px; }
+  #ticket-game .tg-primary, #ticket-game .tg-secondary { min-height: 44px; padding: 10px 14px; font-size: 11px; }
+  #ticket-game .tg-actions, #ticket-game .tg-toolbar { gap: 7px; }
+  #ticket-game .tg-stamps { gap: 12px; margin: 20px 0; }
+  #ticket-game .tg-stamp { width: 62px; height: 62px; font-size: 10px; }
+  #ticket-game .tg-sequence { gap: 9px; margin: 21px 0 17px; }
+  #ticket-game .tg-slot { min-width: 0; min-height: 98px; font-size: 11px; }
+  #ticket-game .tg-feedback { padding: 10px 12px; font-size: 11px; }
+  #ticket-game .tg-start { top: auto; bottom: calc(55px + env(safe-area-inset-bottom, 0px)); left: 18px; width: calc(100vw - 36px); max-height: calc(100dvh - 151px); overflow-y: auto; padding: 25px 27px 23px; }
+  #ticket-game .tg-start .tg-title { font-size: 32px; line-height: 1.6; margin: 13px 0 14px; }
+  #ticket-game .tg-start .tg-eyebrow { font-size: 8px; }
+  #ticket-game .tg-start .tg-lead { font-size: 11px; }
+  #ticket-game .tg-start .tg-actions { margin-top: 18px; }
+  #ticket-game .tg-start .tg-note { font-size: 9px; margin-top: 12px; }
+  #ticket-game .tg-footer { font-size: 9px; margin-top: 20px; padding-top: 15px; }
+}
+@media (max-height: 760px) and (min-width: 601px) {
+  #ticket-game .tg-hud { top: 326px; padding: 12px 15px; width: 260px; }
+  #ticket-game .tg-hud p { font-size: 10px; margin-bottom: 6px; }
+  #ticket-game .tg-progress { margin: 7px 0 9px; }
+  #ticket-game .tg-floating { bottom: 117px; min-height: 50px; }
+  #ticket-game .tg-start { top: 183px; padding: 25px 30px 22px; max-height: calc(100dvh - 215px); overflow-y: auto; }
+  #ticket-game .tg-start .tg-title { font-size: 32px; margin: 11px 0 13px; }
+  #ticket-game .tg-start .tg-lead { font-size: 11px; line-height: 1.9; }
+  #ticket-game .tg-start .tg-actions { margin-top: 15px; }
+  #ticket-game .tg-lens { height: 268px; top: 47%; }
+}
+@media (max-height: 710px) and (max-width: 600px) {
+  #ticket-game .tg-hud { top: calc(163px + env(safe-area-inset-top, 0px)); padding: 9px 10px; }
+  #ticket-game .tg-hud .tg-eyebrow { display: none; }
+  #ticket-game .tg-hud p { font-size: 8px; line-height: 1.7; }
+  #ticket-game .tg-hud .tg-members { display: none; }
+  #ticket-game .tg-lens { top: 48%; height: 215px; grid-template-rows: 32px 1fr 28px; }
+  #ticket-game .tg-lens-head strong { font-size: 12px; }
+  #ticket-game .tg-ghost { font-size: 12px; line-height: 1.8; }
+  #ticket-game .tg-ghost > .tg-icon { width: 22px; height: 22px; margin-bottom: 4px; }
+  #ticket-game .tg-ghost > .tg-icon svg { width: 21px; height: 21px; }
+  #ticket-game .tg-prompt { bottom: calc(224px + env(safe-area-inset-bottom, 0px)); font-size: 9px; padding: 7px 11px; }
+  #ticket-game .tg-floating { bottom: calc(87px + env(safe-area-inset-bottom, 0px)); min-height: 48px; }
+  #ticket-game .tg-toolbar { bottom: calc(87px + env(safe-area-inset-bottom, 0px)); }
+  #ticket-game .tg-start { bottom: calc(27px + env(safe-area-inset-bottom, 0px)); max-height: calc(100dvh - 128px); padding: 20px 25px; }
+  #ticket-game .tg-start .tg-title { font-size: 28px; margin: 9px 0 11px; }
+  #ticket-game .tg-start .tg-lead { font-size: 10px; line-height: 1.9; }
+}
+@media (max-width: 359px) {
+  #ticket-game .tg-hud { left: 12px; right: 145px; }
+  #ticket-game .tg-hud h2, #ticket-game .tg-hud h3 { font-size: 10px; }
+  #ticket-game .tg-lens { width: calc(100vw - 24px); }
+  #ticket-game .tg-ghost { font-size: 12px; }
+  #ticket-game .tg-panel { width: calc(100vw - 20px); padding-left: 18px; padding-right: 18px; }
+  #ticket-game .tg-title { font-size: 22px; }
+  #ticket-game .tg-slot { min-width: 0; }
+}
+@media (max-height: 500px) and (min-width: 601px) {
+  #ticket-game .tg-hud { top: 150px; right: 16px; width: 204px; }
+  #ticket-game .tg-hud .tg-eyebrow, #ticket-game .tg-hud p { display: none; }
+  #ticket-game .tg-lens { width: 53vw; height: 228px; left: 42%; top: 48%; }
+  #ticket-game .tg-ghost { font-size: 16px; }
+  #ticket-game .tg-start { top: 105px; left: 27px; width: 380px; max-height: calc(100dvh - 125px); }
+  #ticket-game .tg-start .tg-title { font-size: 27px; }
+}
+@media (min-width: 601px) {
+  #ticket-game .tg-hud { left: 34px; right: auto; top: 210px; width: 250px; }
+  #ticket-game .tg-toolbar { bottom: 100px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #ticket-game *, #ticket-game *::before, #ticket-game *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
