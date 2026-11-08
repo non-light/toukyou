@@ -1,0 +1,16 @@
+{
+  "name": "tokyo-station-episode-03",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "写真に写らなかった君",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "CHECK_SCENE=1 CHECK_BUILDING_SCENE=1 node --test tests/*.test.mjs",
+    "build": "node scripts/check.mjs && node scripts/build.mjs"
+  }
+}

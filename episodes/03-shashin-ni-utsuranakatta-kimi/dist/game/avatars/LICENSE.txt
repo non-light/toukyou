@@ -1,0 +1,10 @@
+SPDX-License-Identifier: CC0-1.0
+
+Block Person Kit — original procedural character, animations, and preview code.
+To the extent possible under law, the creator has waived copyright and related
+rights in this kit under CC0 1.0 Universal.
+
+You may use, modify, and redistribute it, including in commercial games.
+Attribution is appreciated but is not required. No warranty is provided.
+
+CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
