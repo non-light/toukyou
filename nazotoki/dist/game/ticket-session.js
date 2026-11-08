@@ -1,4 +1,4 @@
-import {sanitizeProgress} from './ticket-state.js?v=ticket1';
+import {sanitizeProgress} from './ticket-state.js?v=audit3';
 
 export async function requestRoom(path,data,fetcher=fetch){
   const response=await fetcher(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),cache:'no-store'});

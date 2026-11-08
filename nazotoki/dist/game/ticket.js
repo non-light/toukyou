@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.module.js';
 import {floorById} from '../floor-layout.js?v=game1';
-import {EPISODE,SPOTS,CLUES,HINTS,initialProgress,sanitizeProgress,targetSpot,nearSpot,applyAction} from './ticket-state.js?v=ticket1';
-import {requestRoom as jsonFetch,roomSessionEnded,recoveredProgress} from './ticket-session.js?v=fix1';
+import {EPISODE,SPOTS,CLUES,HINTS,initialProgress,sanitizeProgress,targetSpot,nearSpot,applyAction} from './ticket-state.js?v=audit3';
+import {requestRoom as jsonFetch,roomSessionEnded,recoveredProgress} from './ticket-session.js?v=audit3';
 import {AVATARS,avatarById,avatarIdFromColor} from './avatar-catalog.js?v=avatar1';
 import {createAvatarActor,createAvatarPreview} from './avatar-layer.js?v=shoulder1';
 
@@ -20,7 +20,7 @@ export function createTicketEpisode(api){
   const root=make('div');root.id='ticket-game';document.body.append(root);
   const embedded=window.self!==window.top;if(embedded)document.body.dataset.ticketEmbedded='true';
   const hud=make('aside','tg-hud');hud.hidden=true;hud.setAttribute('aria-label','物語の進み具合');
-  const eyebrow=make('p','tg-eyebrow','時をこえた一通 · 第1話'),objective=make('strong'),progressRow=make('div','tg-progress'),status=make('small','tg-room','1人で探索中'),memberList=make('div','tg-members');
+  const eyebrow=make('p','tg-eyebrow','時を超えた一通 · 第1作'),objective=make('strong'),progressRow=make('div','tg-progress'),status=make('small','tg-room','1人で探索中'),memberList=make('div','tg-members');
   const actions=make('div','tg-actions');actions.append(button('手帳',()=>open('notebook')),button('道案内',()=>open('route')),button('ヒント',()=>{hintLevel=0;open('hint');}),button('仲間',()=>open('team')));
   hud.append(eyebrow,objective,progressRow,status,memberList,actions);root.append(hud);
   const traveler=button('',()=>open('avatar'),'tg-traveler');traveler.setAttribute('aria-label','自分の旅人を選ぶ');hud.insertBefore(traveler,progressRow);
@@ -43,7 +43,7 @@ export function createTicketEpisode(api){
   function persist(){if(team)return;try{localStorage.setItem(saveKey,JSON.stringify(progress));}catch{}}
   function feedback(message){if(!dialog){api.onNotice(message);return;}let p=panel.querySelector('.tg-feedback');if(!p){p=make('p','tg-feedback');p.setAttribute('role','status');panel.append(p);}p.textContent=message;}
   function close(){if(!dialog){if(lensOn){lensOn=false;refresh();}return;}avatarPreview?.dispose();avatarPreview=null;dialog=null;infoToggle.setAttribute('aria-expanded','false');panel.hidden=scrim.hidden=true;panel.replaceChildren();api.onModalChange(false);if(previousFocus?.isConnected)previousFocus.focus();previousFocus=null;refresh();}
-  function open(type){api.beforeModal?.();if(!dialog){previousFocus=document.activeElement;api.onModalChange(true);}dialog=type;infoToggle.setAttribute('aria-expanded',String(type==='info'));scrim.hidden=panel.hidden=false;lens.hidden=true;sequence=[];renderDialog();panel.scrollTop=0;panel.querySelector('button,input')?.focus({preventScroll:true});}
+  function open(type){if(api.onSelect?.()===false)return;api.beforeModal?.();if(!dialog){previousFocus=document.activeElement;api.onModalChange(true);}dialog=type;infoToggle.setAttribute('aria-expanded',String(type==='info'));scrim.hidden=panel.hidden=false;lens.hidden=true;sequence=[];renderDialog();setBusy(busy);panel.scrollTop=0;panel.querySelector('button,input')?.focus({preventScroll:true});}
   function header(title,kicker='東京駅のふしぎな切符'){const h=make('header','tg-panel-head'),text=make('div');text.append(make('p','tg-eyebrow',kicker));const titleEl=make('h2','tg-title',title);titleEl.id='tg-dialog-title';text.append(titleEl);const x=button(dialog==='info'?'閉じる':'×',close,'tg-close');x.setAttribute('aria-label',dialog==='info'?'ゲーム情報を閉じる':'閉じる');h.append(text,x);panel.append(h);}
   function note(text,cls='tg-note'){panel.append(make('p',cls,text));}
   function addActions(...items){const row=make('div','tg-actions');row.append(...items);panel.append(row);return row;}
@@ -63,22 +63,26 @@ export function createTicketEpisode(api){
     function drawSelection(){for(const item of grid.children){const active=item.dataset.avatar===selectedAvatar,occupied=Boolean(team?.members?.some(member=>member.id!==team.selfId&&memberAvatar(member).id===item.dataset.avatar));item.disabled=occupied;item.setAttribute('aria-pressed',String(active));item.querySelector('small').textContent=occupied?'使用中':active?'あなたの姿':'選べます';}selection.textContent=avatarById(selectedAvatar).name+'で、駅を歩きます。';}
     drawSelection();parent.append(section);
   }
-  function begin(reset){if(team){void leaveTeam(false);}if(reset)progress=initialProgress();playing=true;document.body.dataset.ticketPlaying='true';close();lensOn=false;api.jumpTo(targetSpot(progress).zoneId);persist();refresh();api.onNotice('まずは「切符をかざす」を押してみましょう。');}
+  function begin(reset){if(busy){feedback('通信中です。少し待ってから、もう一度お試しください。');return;}if(api.onSelect?.()===false)return;if(team){feedback('1人で始め直すには、先に「仲間」から部屋を退出してください。');return;}if(reset)progress=initialProgress();playing=true;document.body.dataset.ticketPlaying='true';close();lensOn=false;api.jumpTo(targetSpot(progress).zoneId);persist();refresh();api.onNotice('まずは「切符をかざす」を押してみましょう。');}
   function renderDialog(){
     avatarPreview?.dispose();avatarPreview=null;
     panel.dataset.view=dialog??'';
     panel.replaceChildren();
     if(dialog==='info'){renderInfo();return;}
     if(dialog==='intro'){
-      header(EPISODE.title,'第1話 · はじめての謎解き');
+      header(EPISODE.title,'第1作 · はじめての謎解き');
       const drawing=make('div','tg-invitation');drawing.append(ticketIcon('ticket'),make('span','','時うつしの切符'),ticketIcon('letter'));panel.append(drawing);
       note('宛先の消えた手紙と、古い切符を拾った。\n切符の窓から駅をのぞくと、昔の案内が浮かびあがる。','tg-lead');
-      note('自分の人物の右肩越しに駅を歩き、三つの目印をたどって、この手紙を届けましょう。');
+      note('自分の人物の右肩越しに駅を歩き、三つの目印をたどって、手紙の宛先を見つけましょう。');
       const grid=make('div','tg-grid');for(const [n,t] of [['01','切符をかざして、発見する'],['02','同じ形を、見つける'],['03','印を並べて、手紙を届ける']]){const c=make('div','tg-card');c.append(make('small','tg-eyebrow',n),make('strong','',t));grid.append(c);}panel.append(grid);
       note('制限時間なし · 間違えても減点なし · ヒントあり');
       renderAvatarPicker(panel);
-      if(progress.stage>0||progress.delivered)addActions(button(progress.delivered?'届いた手紙を読み返す':'つづきから遊ぶ',()=>progress.delivered?open('ending'):begin(false),'tg-primary'));
-      addActions(button('最初から遊ぶ',()=>begin(true),'tg-primary'),button('仲間と遊ぶ（1〜4人）',()=>open('team')));return;
+      if(progress.stage>0||progress.delivered)addActions(button(progress.delivered?'届いた手紙を読み返す':'つづきから遊ぶ',()=>progress.delivered?open('letter'):begin(false),'tg-primary'));
+      addActions(button('最初から遊ぶ',()=>progress.stage>0||progress.delivered?open('reset'):begin(true),'tg-primary'),button('仲間と遊ぶ（1〜4人）',()=>open('team')));return;
+    }
+    if(dialog==='reset'){
+      header('最初から、もう一度');note('第1作のソロの記録を最初に戻します。仲間の記録や、ほかの作品の記録は変わりません。');
+      addActions(button('最初からはじめる',()=>begin(true),'tg-primary'),button('記録を残して戻る',()=>open('intro')));return;
     }
     if(dialog==='avatar'){
       header('あなたの旅人','四つの色、四つの旅。');renderAvatarPicker(panel);note('この人物の右肩越しに駅を歩きます。立ち止まる・歩く・走る動きにも対応しています。');addActions(button('この旅人で駅に戻る',close,'tg-primary'));return;
@@ -87,7 +91,7 @@ export function createTicketEpisode(api){
       header('旅の手帳','見つけた言葉は、ここに。');
       for(let i=0;i<3;i++){const card=make('article','tg-card');card.append(ticketIcon(SPOTS[i].id),make('small','tg-eyebrow',`0${i+1} · ${SPOTS[i].floor}`));if(progress.stage>i){card.append(make('h3','',SPOTS[i].title),make('p','',CLUES[i].text));}else card.append(make('h3','',i===progress.stage?'次の発見を待っています':'まだ見つけていない案内'));panel.append(card);}
       if(progress.delivered)note('手紙は無事に届きました。見つけた案内を、いつでも読み返せます。');else if(progress.stage===3)note('三つの印がそろいました。ポストの前で手紙を届けましょう。');
-      if(progress.delivered)addActions(button('届いた手紙を読む',()=>open('ending'),'tg-primary'));
+      if(progress.delivered)addActions(button('届いた手紙を読む',()=>open('letter'),'tg-primary'));
       addActions(button('駅に戻る',close));return;
     }
     if(dialog==='route'){
@@ -119,23 +123,24 @@ export function createTicketEpisode(api){
       if(progress.stage===3)addActions(button('手紙を開く',()=>open('letter'),'tg-primary'));else{note('次の目印：'+targetSpot(progress).floor+' · '+targetSpot(progress).title);addActions(button('次の目印へ',()=>open('route'),'tg-primary'),button('自分で探す',close));}return;
     }
     if(dialog==='letter'){
-      header('未来の駅を歩く、あなたへ','宛先の戻った手紙');note(CLUES[3].text,'tg-lead');note('忙しい毎日のなかで、\n小さな約束を見つけてくれた、あなたへ。\n\nいつかまた、銀の鈴の下で。');
-      addActions(button('手紙を届ける',()=>void submit({type:'deliver'}),'tg-primary'),button('あとで届ける',close));return;
+      header('未来の駅を歩く、あなたへ','宛先の戻った手紙');note(CLUES[3].text,'tg-lead');note('忙しい毎日のなかで、\n小さな約束を見つけてくれた、あなたへ。\n\nいつかまた、銀の鈴の下で。');note(progress.delivered?'ここまで歩いてきたあなたに届いた一通。\n受け取った言葉を、次にこの駅を歩く人へと託しました。':'この手紙は、ここまで歩いてきたあなたに届いたのでした。\n受け取った言葉を、今度は次にこの駅を歩く人へ。\nポストに託して、小さな約束をつなぎましょう。');
+      if(progress.delivered){note('あなたに届いた言葉は、旅の手帳に残っています。手紙は次の旅人へ託しました。');addActions(button('結末を読む',()=>open('ending'),'tg-primary'),button('駅に戻る',close));}
+      else addActions(button('手紙を届ける',()=>void submit({type:'deliver'}),'tg-primary'),button('あとで届ける',close));return;
     }
     if(dialog==='ending'){
-      header('手紙を届けました','第1話 · おしまい');const end=make('div','tg-ending');end.append(ticketIcon('letter'),make('strong','','配達完了'),make('p','','また、この駅で。'));panel.append(end);note('鈴の音、三本の光、小さな赤レンガの駅舎。\nあなたがつないだ道が、ひとつの約束を届けました。','tg-lead');
+      header('手紙を、次の旅人へ','第1作 · おしまい');const end=make('div','tg-ending');end.append(ticketIcon('letter'),make('strong','','約束をつなぎました'),make('p','','また、この駅で。'));panel.append(end);note('鈴の音、三本の光、小さな赤レンガの駅舎。\nあなたに届いた一通は、次にこの駅を歩く人への便りになりました。','tg-lead');
       if(team)note('仲間と一緒に届けた手紙は、みんなの手帳に残りました。');
-      addActions(button('駅を歩きつづける',close,'tg-primary'),button('手帳を読む',()=>open('notebook')));if(!team)addActions(button('もう一度遊ぶ',()=>begin(true)));return;
+      addActions(button('駅を歩きつづける',close,'tg-primary'),button('手帳を読む',()=>open('notebook')));if(!team)addActions(button('もう一度遊ぶ',()=>open('reset')));return;
     }
     if(dialog==='team'){renderTeam();}
   }
   function refreshOpenDialog(){
     const active=document.activeElement,restore=panel.contains(active),text=active?.textContent,label=active?.getAttribute?.('aria-label'),scroll=panel.scrollTop;
-    renderDialog();panel.scrollTop=scroll;
+    renderDialog();setBusy(busy);panel.scrollTop=scroll;
     if(restore){const match=[...panel.querySelectorAll('button')].find(item=>(label&&item.getAttribute('aria-label')===label)||(!label&&item.textContent===text));(match??panel.querySelector('.tg-close'))?.focus({preventScroll:true});}
   }
   function renderInfo(){
-    header('ゲーム情報','時をこえた一通 · 第1話');
+    header('ゲーム情報','時を超えた一通 · 第1作');
     const player=api.getPlayer(),location=api.getLocation?.(),target=targetSpot(progress),summary=make('div','tg-info-summary');
     summary.append(make('p','tg-info-location',`${player.floor} · ${location?.title??'東京駅'}`),make('p','tg-info-next',progress.delivered?'手紙を届けました':progress.stage===3?'宛先の戻った手紙を届けよう':`次の目印：${target.floor} · ${target.title}`),make('p','tg-info-mode',team?(networkError?'再接続を待っています':`${team.members?.filter(member=>member.online).length??1}人で協力中 · 合言葉 ${team.code}`):'1人で探索中'));panel.append(summary);
     const stamps=make('div','tg-info-stamps');for(let i=0;i<3;i++){const stamp=make('span','tg-stamp');stamp.classList.toggle('is-found',progress.stage>i);stamp.append(ticketIcon(SPOTS[i].id),make('small','',progress.stage>i?'✓':String(i+1)));stamp.setAttribute('aria-label',SPOTS[i].title+(progress.stage>i?'の印を発見済み':'の印は未発見'));stamps.append(stamp);}panel.append(stamps);
@@ -183,14 +188,23 @@ export function createTicketEpisode(api){
     teamRecovery={code:error.status===401?session.code:'',message:error.status===401?'部屋との接続が終了しました。見つけた案内は手帳に残しています。合言葉で入り直すか、1人で続けられます。':'部屋の期限が切れました。見つけた案内は手帳に残しています。新しい部屋をつくるか、1人で続けられます。'};
     lensOn=false;open('team');refresh();
   }
-  async function leaveTeam(showIntro){const previous=team;team=null;syncing=null;networkError='';clearPeers();try{sessionStorage.removeItem(teamKey);}catch{}if(previous)void jsonFetch(`/api/rooms/${previous.code}/leave`,{token:previous.token}).catch(()=>{});let local;try{local=JSON.parse(localStorage.getItem(saveKey));}catch{}progress=sanitizeProgress(local);if(showIntro){close();playing=false;delete document.body.dataset.ticketPlaying;open('intro');}refresh();}
+  async function leaveTeam(showIntro){
+    if(busy){feedback('通信中です。少し待ってから部屋を退出してください。');return;}
+    const previous=team,shared=progress;
+    let local;try{local=JSON.parse(localStorage.getItem(saveKey));}catch{}
+    team=null;syncing=null;networkError='';clearPeers();
+    try{sessionStorage.removeItem(teamKey);}catch{}
+    progress=recoveredProgress(shared,local);persist();
+    if(previous)void jsonFetch(`/api/rooms/${previous.code}/leave`,{token:previous.token}).catch(()=>{});
+    if(showIntro){close();playing=false;delete document.body.dataset.ticketPlaying;open('intro');}refresh();
+  }
   async function sync(action,avatarId){if(!team)return null;if(syncing)await syncing;if(!team)return null;const session=team;const p=api.getPlayer();const task=jsonFetch(`/api/rooms/${session.code}/sync`,{token:session.token,position:{x:p.x,z:p.z,floor:p.floor,yaw:p.yaw??0},...(action?{action}:{}),...(avatarId?{avatarId}:{})}).then(value=>{acceptRoom(value,session);return value;}).catch(e=>{if(team===session){if(roomSessionEnded(e))endRoomSession(session,e);else{const changed=networkError!==e.message;if(e.code!=='avatar_taken')networkError=e.message;refresh();if(changed&&dialog==='info'&&!busy)refreshOpenDialog();}}throw e;});syncing=task;try{return await task;}finally{if(syncing===task)syncing=null;}}
-  function setBusy(value){for(const b of panel.querySelectorAll('button')){if(value){b.dataset.wasDisabled=String(b.disabled);b.disabled=true;}else if(b.dataset.wasDisabled!==undefined){b.disabled=b.dataset.wasDisabled==='true';delete b.dataset.wasDisabled;}}panel.setAttribute('aria-busy',String(value));}
-  async function submit(action){if(busy)return;busy=true;setBusy(true);try{let result;if(team){const value=await sync(action);const outcome=value?.action;result={correct:outcome?.ok===true||outcome?.correct===true,message:outcome?.message??'同じ場所でもう一度試してみましょう。'};}else{result=applyAction(progress,action,api.getPlayer());progress=result.progress;persist();}
+  function setBusy(value){for(const b of panel.querySelectorAll('button')){if(value){if(b.dataset.wasDisabled===undefined)b.dataset.wasDisabled=String(b.disabled);b.disabled=true;}else if(b.dataset.wasDisabled!==undefined){b.disabled=b.dataset.wasDisabled==='true';delete b.dataset.wasDisabled;}}panel.setAttribute('aria-busy',String(value));if(!value&&dialog&&!panel.contains(document.activeElement))panel.querySelector('button:not([disabled]),input:not([disabled])')?.focus({preventScroll:true});}
+  async function submit(action){if(busy)return;busy=true;setBusy(true);const requestTeam=team;try{let result;if(requestTeam){const value=await sync(action);if(team!==requestTeam)return;const outcome=value?.action;result={correct:outcome?.ok===true||outcome?.correct===true,message:outcome?.message??'同じ場所でもう一度試してみましょう。'};}else{result=applyAction(progress,action,api.getPlayer());progress=result.progress;persist();}
       if(result.correct){lensOn=false;chime(action.type==='deliver');open(progress.delivered?'ending':'discovery');}else feedback(result.message);
     }catch(e){feedback(e.message);}finally{busy=false;setBusy(false);if(dialog==='order'){const check=[...panel.querySelectorAll('button')].find(b=>b.textContent==='この順番で届ける');if(check)check.disabled=sequence.length!==3;}refresh();}}
   function chime(ending=false){if(document.querySelector('#sound')?.getAttribute('aria-pressed')!=='true')return;try{const context=new(window.AudioContext||window.webkitAudioContext)();const tones=ending?[523,659,784,1046]:[659,880];tones.forEach((f,i)=>{const o=context.createOscillator(),g=context.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,context.currentTime+i*.17);g.gain.linearRampToValueAtTime(.035,context.currentTime+i*.17+.02);g.gain.exponentialRampToValueAtTime(.001,context.currentTime+i*.17+.65);o.connect(g);g.connect(context.destination);o.start(context.currentTime+i*.17);o.stop(context.currentTime+i*.17+.7);});setTimeout(()=>context.close(),1600);}catch{}}
-  function readClue(){if(!playing||!lensOn)return;const spot=targetSpot(progress);if(!nearSpot(api.getPlayer(),spot)||!isLooking(spot)){api.onNotice('目印の近くで、その方向を見ながら切符をかざしてみましょう。');return;}if(progress.delivered){open('ending');return;}if(progress.stage===0)void submit({type:'bell'});else open(progress.stage===1?'choice':progress.stage===2?'order':'letter');}
+  function readClue(){if(!playing||!lensOn)return;const spot=targetSpot(progress);if(!nearSpot(api.getPlayer(),spot)||!isLooking(spot)){api.onNotice('目印の近くで、その方向を見ながら切符をかざしてみましょう。');return;}if(progress.delivered){open('letter');return;}if(progress.stage===0)void submit({type:'bell'});else open(progress.stage===1?'choice':progress.stage===2?'order':'letter');}
   function isLooking(spot){const p=api.getPlayer();return api.project({x:spot.modelX,y:p.y+.65,z:spot.modelZ}).visible;}
   function refresh(){
     hud.hidden=toolbar.hidden=compact.hidden=!playing;resume.hidden=false;root.dataset.playing=String(playing);if(!playing){lens.hidden=prompt.hidden=true;delete document.body.dataset.ticketLens;return;}
@@ -201,7 +215,7 @@ export function createTicketEpisode(api){
     const active=api.isActive()&&!dialog;lens.hidden=!lensOn||!active;document.body.dataset.ticketLens=String(!lens.hidden);ticket.lastChild?.nodeType===3?ticket.lastChild.textContent=lensOn?'切符をしまう':'切符をかざす':null;ticket.setAttribute('aria-pressed',String(lensOn));
     const near=nearSpot(api.getPlayer(),target),visible=near&&isLooking(target);read.hidden=!lensOn||!visible||!active;read.textContent=progress.delivered?'届いた手紙を読む':progress.stage===3?'宛先の戻った手紙を開く':'昔の案内を読む';
     prompt.hidden=!active||!near||progress.delivered||lensOn;prompt.textContent=lensOn?(visible?'昔の言葉が浮かんでいます。案内を読んでみましょう。':'目印の方へ、ゆっくり向いてみましょう。'):'切符が淡く光っています。ここで使えそう。';
-    const ghostSignature=`${progress.stage}:${visible}:${progress.delivered}`;if(lastGhost!==ghostSignature){lastGhost=ghostSignature;ghost.replaceChildren();if(visible){ghost.append(ticketIcon(progress.stage===0?'pillars':progress.stage===1?'postbox':progress.stage===2?'ticket':'letter'),make('p','',CLUES[progress.stage].text));}else ghost.append(make('small','','切符をかざして、目印を探そう。'));ghost.classList.toggle('is-visible',visible);lensFoot.textContent=visible?(progress.delivered?'「届いた手紙を読む」で、手紙を読み返せます。':progress.stage===3?'下のボタンで手紙を開きましょう。':'「昔の案内を読む」で、手帳に残しましょう。'):near?'切符の外をドラッグして、目印の方を見てみよう。':`${target.floor} · ${target.title}の近くで、見まわしてみよう。`;}
+    const ghostSignature=`${progress.stage}:${near}:${visible}:${progress.delivered}`;if(lastGhost!==ghostSignature){lastGhost=ghostSignature;ghost.replaceChildren();if(visible){ghost.append(ticketIcon(progress.stage===0?'pillars':progress.stage===1?'postbox':progress.stage===2?'ticket':'letter'),make('p','',CLUES[progress.stage].text));}else ghost.append(make('small','','切符をかざして、目印を探そう。'));ghost.classList.toggle('is-visible',visible);lensFoot.textContent=visible?(progress.delivered?'「届いた手紙を読む」で、手紙を読み返せます。':progress.stage===3?'下のボタンで手紙を開きましょう。':'「昔の案内を読む」で、手帳に残しましょう。'):near?'切符の外をドラッグして、目印の方を見てみよう。':`${target.floor} · ${target.title}の近くで、見まわしてみよう。`;}
   }
   function updateSelfAvatar(dt){
     if(!playing){if(selfActor)selfActor.object.visible=false;return;}
@@ -243,9 +257,14 @@ export function createTicketEpisode(api){
     }
     for(const [id,item]of peers)if(!wanted.has(id)){removePeer(item);peers.delete(id);}
   }
-  on(scrim,'click',close);on(document,'keydown',event=>{if(!dialog)return;if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();close();return;}if(event.key==='Tab'){const elements=[...panel.querySelectorAll('button:not([disabled]),input:not([disabled]),a[href]')].filter(e=>!e.closest('[hidden]'));const first=elements[0],last=elements.at(-1);if(event.shiftKey&&(document.activeElement===first||document.activeElement===panel)){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}},true);
+  on(scrim,'click',close);on(document,'keydown',event=>{if(!dialog)return;if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();close();return;}if(event.key==='Tab'){const elements=[...panel.querySelectorAll('button:not([disabled]),input:not([disabled]),a[href]')].filter(e=>!e.closest('[hidden]'));const first=elements[0],last=elements.at(-1);if(!panel.contains(document.activeElement)){event.preventDefault();(first??panel).focus();return;}if(event.shiftKey&&(document.activeElement===first||document.activeElement===panel)){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}},true);
   function update(dt){if(disposed)return;avatarPreview?.update(dt);updateSelfAvatar(dt);updatePeers(dt);lastTick+=dt;if(lastTick>.12){lastTick=0;refresh();}if(team&&playing&&!document.hidden&&performance.now()-lastPoll>1500&&!syncing){lastPoll=performance.now();void sync().catch(()=>{});}}
   function dispose(){close();disposed=true;selfRequest++;selfActor?.dispose();selfActor=null;listeners.forEach(fn=>fn());clearPeers();root.remove();launch.remove();resume.remove();delete document.body.dataset.ticketLens;delete document.body.dataset.ticketPlaying;if(embedded)delete document.body.dataset.ticketEmbedded;}
   refresh();if(new URLSearchParams(location.search).has('room'))open('team');
-  return {update,close,dispose,get shoulderView(){return playing;}};
+  function suspend(){
+    if(busy){api.onNotice('第1作の通信中です。少し待ってから物語を切り替えてください。');return false;}
+    if(team){api.onNotice('ほかの物語へ進むには「仲間」から部屋を退出してください。第1作の部屋はそのまま続けられます。');return false;}
+    close();playing=false;lensOn=false;if(selfActor)selfActor.object.visible=false;delete document.body.dataset.ticketPlaying;refresh();return true;
+  }
+  return {update,close,dispose,suspend,openIntro:()=>open('intro'),get playing(){return playing;},get shoulderView(){return playing;}};
 }

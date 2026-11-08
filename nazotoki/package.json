@@ -1,12 +1,12 @@
 {
   "name": "tokyo-station-game-studio",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.6.0",
   "type": "module",
-  "description": "時をこえた一通 — original station preserved, ticket mystery for 1–4 players",
+  "description": "東京駅の四つの物語 — 時を超えた一通 / さよならを言わない待ち合わせ / 写真に写らなかった君 / あの日の約束を、もう一度",
   "scripts": {
     "start": "node scripts/dev-game.mjs",
-    "check": "node scripts/check-original.mjs && node --check dist/app.js && node --check dist/scene.js && node --check dist/station-layout.js && node --check dist/station-map.js && node --check dist/floor-layout.js && node --check dist/building-scene.js && node --check dist/station-guide-data.js && node --check dist/gate-visuals.js && node --check dist/train-data.js && node --check dist/train-scene.js && node --check dist/landmarks.js && node --check dist/landmark-scene.js && node --check dist/sw.js && node --check dist/game/content.js && node --check dist/game/state.js && node --check dist/game/characters.js && node --check dist/game/addon.js && node --check dist/game/ticket.js && node --check dist/game/ticket-state.js && node --check dist/game/ticket-session.js && node --check server-app/lib/rooms.mjs && node --check server-app/lib/room-state.mjs && node --check dist/game/avatar-catalog.js && node --check dist/game/avatar-layer.js && node --check dist/vendor/avatar/GLTFLoader.js && node --check dist/vendor/avatar/BufferGeometryUtils.js && node --check dist/game/shoulder-camera.js",
+    "check": "node scripts/check-original.mjs && node --check dist/app.js && node --check dist/scene.js && node --check dist/station-layout.js && node --check dist/station-map.js && node --check dist/floor-layout.js && node --check dist/building-scene.js && node --check dist/station-guide-data.js && node --check dist/gate-visuals.js && node --check dist/train-data.js && node --check dist/train-scene.js && node --check dist/landmarks.js && node --check dist/landmark-scene.js && node --check dist/sw.js && node --check dist/game/content.js && node --check dist/game/state.js && node --check dist/game/characters.js && node --check dist/game/addon.js && node --check dist/game/ticket.js && node --check dist/game/ticket-state.js && node --check dist/game/ticket-session.js && node --check server-app/lib/rooms.mjs && node --check server-app/lib/room-state.mjs && node --check dist/game/avatar-catalog.js && node --check dist/game/avatar-layer.js && node --check dist/vendor/avatar/GLTFLoader.js && node --check dist/vendor/avatar/BufferGeometryUtils.js && node --check dist/game/shoulder-camera.js && node --check dist/game/episodes.js && node --check dist/game/farewell-state.js && node --check dist/game/farewell.js && node --check dist/game/photograph-state.js && node --check dist/game/photograph-camera.js && node --check dist/game/photograph.js && node --check dist/game/promise-evidence.js && node --check dist/game/promise-state.js && node --check dist/game/promise.js",
     "test": "CHECK_SCENE=1 CHECK_BUILDING_SCENE=1 node --test tests/*.test.mjs",
     "build": "node scripts/build-game.mjs"
   }

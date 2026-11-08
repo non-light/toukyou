@@ -1,5 +1,5 @@
 import {createShoulderCamera} from './game/shoulder-camera.js?v=shoulder1';
-import {createGameAddon} from './game/addon.js?v=fix1';
+import {createGameAddon} from './game/addon.js?v=audit3';
 import * as THREE from './vendor/three.module.js';
 import {createBuildingScene} from './building-scene.js?v=game1';
 import {GROUPS as BASE_GROUPS,areaAt,zoneLabel} from './station-layout.js?v=game1';
@@ -46,7 +46,7 @@ function selectGroup(group,announce=true){
 }
 function stopTour(announce=true){if(!tour)return;tour=null;$('tour-status').hidden=true;updateNav();if(announce)toast('ガイド散策を終了しました。自由に歩いてみましょう。')}
 function manualInput(){if(tour)stopTour(false);lookTarget=null}
-function fadeJump(zone){clearTimeout(jumpTimer);floorTravel=null;lastConnectorId=null;app.classList.remove('transition-fade');void app.offsetWidth;app.classList.add('transition-fade');jumpTimer=setTimeout(()=>{applyFloor(zone.floor);player.set(zone.x,floorById(zone.floor).elevation+1.65,zone.z);yaw=zone.yaw??0;pitch=zone.pitch??.08;lookTarget=null;markVisited(zone.id)},260);setTimeout(()=>app.classList.remove('transition-fade'),700)}
+function fadeJump(zone){clearTimeout(jumpTimer);floorTravel=null;app.classList.remove('changing-floor');$('floor-transit').hidden=true;for(const select of document.querySelectorAll('[data-floor-select]'))select.disabled=false;lastConnectorId=null;app.classList.remove('transition-fade');void app.offsetWidth;app.classList.add('transition-fade');jumpTimer=setTimeout(()=>{applyFloor(zone.floor);player.set(zone.x,floorById(zone.floor).elevation+1.65,zone.z);yaw=zone.yaw??0;pitch=zone.pitch??.08;lookTarget=null;markVisited(zone.id)},260);setTimeout(()=>app.classList.remove('transition-fade'),700)}
 function jump(id){const zone=ZONES.find(z=>z.id===id);if(!zone)return;start();stopTour(false);closePanels();closeSpot();clearInputs();if(zone.group!=='general')selectGroup(zone.group,false);fadeJump(zone);toast(`${zone.floor} ${displayZone(zone)}へ移動しました`)}
 function tourZones(){const ids=selectedGroup==='keiyo'?['keiyo-start','keiyo-passage','keiyo-concourse','keiyo-intermediate','keiyo-platform-12']:selectedGroup==='sobu'?['b1-concourse','sobu-concourse','sobu-platform-12']:selectedGroup==='east'?['jr-east-north','m2-east-north','platform-east-2021']:selectedGroup==='tokaido'?['tokaido-central','m2-tokaido-central','platform-tokaido-1415']:null;return ids?ids.map(id=>ZONES.find(z=>z.id===id)):ZONES.filter(z=>z.floor===currentFloor)}
 function setTourStop(index,list=tour?.list??tourZones()){if(index>=list.length){stopTour(false);toast(`${list.length}スポットを巡りました。引き続き、自由な散策を。`);return}const zone=list[index],path=buildingRoute({x:player.x,z:player.z,floor:currentFloor},zone,allowed);if(!path.length){stopTour(false);toast('通路の中央へ少し移動してから、ガイド散策を始めてください。');return}tour={index,list,zone,path,waypoint:0,phase:'travel',hold:0,stuck:0};$('tour-count').textContent=`${String(index+1).padStart(2,'0')} / ${String(list.length).padStart(2,'0')}`;$('tour-title').textContent=`${zone.floor} ${displayZone(zone)}`;$('tour-status').hidden=false;updateNav()}
@@ -142,6 +142,7 @@ function setupGameEdition(){
   getLocation:()=>resolveLocation({x:player.x,z:player.z,floor:currentFloor}),
   openMap:()=>openPanel('map'),openSettings:()=>openPanel('settings'),openHelp:()=>openPanel('help'),
   project:({x,y,z})=>{const point=new THREE.Vector3(x,y,z).project(camera);return {x:(point.x*.5+.5)*innerWidth,y:(-.5*point.y+.5)*innerHeight,visible:point.z>-1&&point.z<1&&Math.abs(point.x)<.95&&Math.abs(point.y)<.95}},
+  isStarted:()=>started,
   isActive:()=>started&&!activePanel&&!activeSpot&&!floorTravel&&!gameOverlayOpen,
   isAllowed:(x,z,floor)=>allowed(x,z,floor),
   onModalChange:open=>{gameOverlayOpen=open;clearInputs();if(open){stopTour(false);closePanels();closeSpot()}},

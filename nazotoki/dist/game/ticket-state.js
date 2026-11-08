@@ -2,9 +2,9 @@
 // station model and can run in either the browser or a room server.
 export const EPISODE=Object.freeze({
   id:'time-letter-v1',
-  title:'時をこえた一通',
+  title:'時を超えた一通',
   subtitle:'東京駅のふしぎな切符',
-  description:'古い切符をかざすと、昔の案内が浮かび上がる。三つの目印をたどって、宛先の消えた手紙を届けましょう。',
+  description:'古い切符をかざすと、昔の案内が浮かび上がる。三つの目印をたどり、あなたに届いた一通を、次の旅人へつなぎましょう。',
   duration:'10〜15分',
   difficulty:'はじめての謎解き',
 });
@@ -27,7 +27,7 @@ export const HINTS=Object.freeze([
   Object.freeze(['最初の目印は、B1Fの「銀の鈴」です。','銀の鈴の近くで「切符をかざす」を押してみましょう。','昔の案内が見えたら、案内を読んで最初の印を受け取りましょう。']),
   Object.freeze(['次の目印は、同じB1Fの「SQUARE ZERO」です。','切符に見える絵と、選択肢の形を見比べてみましょう。','「小さな駅舎」の形をした箱は、赤レンガ駅舎型ポストです。']),
   Object.freeze(['最後の目印は、1Fの「赤レンガ駅舎型ポスト」です。','手帳には、見つけた目印が順番に残っています。','「銀の鈴 → 三本の柱 → ポスト」の順に並べましょう。']),
-  Object.freeze(['三つの印がそろいました。','赤レンガ駅舎型ポストの前で、宛先の戻った手紙を開きましょう。','「手紙を届ける」を押すと、お話が完了します。']),
+  Object.freeze(['三つの印がそろいました。','赤レンガ駅舎型ポストの前で、宛先の戻った手紙を開きましょう。','あなたに届いた手紙を読み、次にこの駅を歩く人へポストから託しましょう。']),
 ]);
 
 export function initialProgress(){return {version:1,stage:0,delivered:false};}
@@ -70,7 +70,7 @@ export function applyAction(value,action,position){
   if(!nearSpot(position,spot))return result(false,`${spot.floor}の「${spot.title}」の近くで試してみましょう。`);
   if(action.type==='deliver'){
     progress.delivered=true;
-    return result(true,'手紙を届けました。また、この駅で会いましょう。');
+    return result(true,'あなたに届いた一通を、次の旅人へ託しました。また、この駅で会いましょう。');
   }
   progress.stage++;
   return result(true,action.type==='bell'?'鈴の印を受け取りました。次は、三本の光の柱へ。':action.type==='choice'?'同じ形が見つかりました。次は、1Fのポストへ。':'三つの印がそろい、手紙の宛先が戻りました。');

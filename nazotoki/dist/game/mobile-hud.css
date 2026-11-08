@@ -28,12 +28,12 @@ body[data-ticket-lens='true'] #ticket-game .tg-lens-window { background: linear-
 
 @media (max-width: 700px) {
   body[data-ticket-playing='true'] {
-    --tg-host-offset: 0px;
-    --tg-mobile-top: calc(max(12px, env(safe-area-inset-top, 0px)) + var(--tg-host-offset));
+    --tg-mobile-top: max(12px, env(safe-area-inset-top, 0px));
   }
 
-  /* Embedded hosts may keep their own back/share controls above the game. */
-  body[data-ticket-playing='true'][data-ticket-embedded='true'] { --tg-host-offset: 104px; }
+  /* The iframe is already below its host's back/share controls. Do not reserve
+     the host header or the device's safe area a second time inside it. */
+  body[data-ticket-playing='true'][data-ticket-embedded='true'] { --tg-mobile-top: 12px; }
 
   body[data-ticket-playing='true'] .topbar,
   body[data-ticket-playing='true'] .location-pill,
@@ -44,7 +44,7 @@ body[data-ticket-lens='true'] #ticket-game .tg-lens-window { background: linear-
     z-index: 2;
     top: var(--tg-mobile-top, 12px);
     left: max(12px, env(safe-area-inset-left, 0px));
-    right: max(12px, env(safe-area-inset-right, 0px));
+    right: calc(max(12px, env(safe-area-inset-right, 0px)) + 108px);
     display: flex;
     align-items: center;
     gap: 9px;
@@ -61,7 +61,6 @@ body[data-ticket-lens='true'] #ticket-game .tg-lens-window { background: linear-
     -webkit-backdrop-filter: blur(12px);
     pointer-events: auto;
   }
-  body[data-ticket-playing='true'][data-ticket-embedded='true'] #ticket-game .tg-compact { right: max(72px, env(safe-area-inset-right, 0px)); }
   #ticket-game .tg-compact-floor { flex: 0 0 auto; min-width: 35px; padding: 5px 6px; color: #465f4a; background: #e9ebdf; border: 1px solid #c8d0bc; border-radius: 3px; text-align: center; font-size: 11px; font-weight: 600; line-height: 1.4; }
   #ticket-game .tg-compact-goal { display: block; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; line-height: 1.5; }
   #ticket-game .tg-info-toggle { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 5px; min-width: 62px; height: 44px; min-height: 44px; padding: 0 10px; color: #3d5a46; background: #e8eadb; border: 1px solid #cad2bb; border-radius: 4px; font-size: 12px; line-height: 1.4; pointer-events: auto; touch-action: manipulation; }
@@ -123,7 +122,7 @@ body[data-ticket-lens='true'] #ticket-game .tg-lens-window { background: linear-
 
   body[data-ticket-playing='true'] .mini-map,
   body[data-ticket-playing='true'] .started .mini-map {
-    top: calc(var(--tg-mobile-top) + 60px);
+    top: var(--tg-mobile-top);
     right: max(12px, env(safe-area-inset-right, 0px));
     bottom: auto;
     width: 96px;
@@ -199,11 +198,6 @@ body[data-ticket-lens='true'] #ticket-game .tg-lens-window { background: linear-
   body[data-ticket-playing='true'] .bottom-nav #guided-walk,
   body[data-ticket-playing='true'] .bottom-nav #game-open-studio { flex: 0 0 44px; padding: 10px 5px; }
   body[data-ticket-playing='true'] .bottom-nav #guided-walk > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-}
-
-/* A short iframe already sits below its host header; keep space for the text. */
-@media (max-width: 700px) and (max-height: 520px) {
-  body[data-ticket-playing='true'][data-ticket-embedded='true'] { --tg-host-offset: 0px; }
 }
 
 @keyframes tg-info-slide { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }

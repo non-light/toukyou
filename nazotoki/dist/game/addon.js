@@ -1,7 +1,7 @@
 import {GAME_CONTENT} from './content.js?v=game1';
 import {createGameState} from './state.js?v=game1';
 import {createCharacterLayer} from './characters.js?v=game1';
-import {createTicketEpisode} from './ticket.js?v=fix1';
+import {createStoryEpisodes} from './episodes.js?v=audit3';
 
 const clone=value=>JSON.parse(JSON.stringify(value));
 const make=(tag,className,text)=>{const element=document.createElement(tag);if(className)element.className=className;if(text!==undefined)element.textContent=text;return element;};
@@ -20,7 +20,7 @@ export function createGameAddon(api){
   const scrim=make('div','game-modal-scrim');scrim.hidden=true;
   const panel=make('section','game-modal');panel.id='game-modal';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','game-modal-title');panel.tabIndex=-1;
   root.append(world,scrim,panel);document.body.append(root);
-  const episode=createTicketEpisode({...api,beforeModal:()=>close()});
+  const episode=createStoryEpisodes({...api,beforeModal:()=>close()});
   const studioButton=button('制作',()=>openStudio(),'game-studio-nav');studioButton.id='game-open-studio';studioButton.setAttribute('aria-label','ゲーム制作画面を開く');
   const pencil=document.createElementNS('http://www.w3.org/2000/svg','svg');pencil.setAttribute('viewBox','0 0 24 24');pencil.setAttribute('aria-hidden','true');const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','m4 16 12-12 4 4L8 20H4Zm10-10 4 4M4 20h16');pencil.append(path);studioButton.prepend(pencil);document.querySelector('.bottom-nav')?.append(studioButton);
 

@@ -1,0 +1,47 @@
+/* Native paper clues; all drawing stays inside the episode's evidence UI. */
+.pm-sketch{margin:20px 0 24px;padding:12px 16px 15px;border:1px solid #d8c9b0;background:#fffaf0;box-shadow:0 3px 12px #54453309;transform:rotate(-.35deg)}
+.pm-sketch svg{display:block;width:100%;height:auto;max-height:220px;fill:none;stroke:#75634e;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pm-sketch .pm-sketch-rim{stroke:#9c8770;stroke-width:1.3}
+.pm-sketch .pm-sketch-spoke{stroke:#8c785e;stroke-width:1.7}
+.pm-sketch .pm-sketch-ground{stroke:#bba98e;stroke-width:1.2}
+.pm-sketch .pm-sketch-rod{fill:#e1d4be;stroke:#78644b;stroke-width:1.6}
+.pm-sketch .pm-sketch-pin{fill:#8a7558;stroke:#6e5d46;stroke-width:1}
+.pm-sketch figcaption{margin:0;color:#8a765d;font-size:11px;line-height:1.8;text-align:center}
+.pm-weave{margin:24px 0;padding:20px;border:1px solid #d6c6aa;border-radius:7px;background:#f1e8d8;color:#655742}
+.pm-weave-instructions{margin:0 0 18px;font-size:13px;line-height:1.95}
+.pm-weave-strips{display:grid;gap:12px}
+.pm-weave-strip{display:grid;grid-template-columns:1fr auto;align-items:center;gap:11px 16px;min-width:0;padding:14px 16px;border:1px solid #d6c6aa;border-radius:4px;background:#fffaf0}
+.pm-weave-source{display:flex;align-items:baseline;gap:12px;grid-column:1/-1;min-width:0}
+.pm-weave-source strong{font-size:13px;font-weight:500}
+.pm-weave-position{color:#8b7c68;font-size:11px}
+.pm-weave-letters{display:flex;align-items:center;gap:8px;min-width:0}
+.pm-weave-letter{display:inline-flex;align-items:center;justify-content:center;flex:0 0 38px;width:38px;height:43px;border:1px solid #d8c9b1;border-radius:3px;background:#f7f0e2;color:#5c4b36;font:400 22px/1.3 'Noto Serif JP',serif}
+.pm-weave-letter.is-next{border-color:#95754c;border-bottom-width:3px;background:#fffdf7}
+.pm-weave-letter.is-used{border-style:dashed;color:#a59680;background:#ebe2d2;text-decoration:line-through;text-decoration-thickness:1px}
+#promise-game .pm-weave button{min-height:44px;padding:10px 14px;border:1px solid #b9a487;border-radius:4px;background:#f8f0e2;color:#69563c;font-size:12px;line-height:1.65;white-space:normal;overflow-wrap:anywhere;text-align:center;touch-action:manipulation}
+#promise-game .pm-weave button:hover:not(:disabled){background:#eadfc9}
+#promise-game .pm-weave button:disabled{opacity:.5;cursor:default}
+#promise-game .pm-weave button:focus-visible{outline:3px solid #967745;outline-offset:3px}
+.pm-weave-take{min-width:155px;max-width:235px}
+.pm-weave-result{margin:22px 0 0}
+.pm-weave-result-label{margin:0 0 10px;color:#817159;font-size:12px}
+.pm-weave-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.pm-weave-slot{display:flex;align-items:center;justify-content:center;height:54px;min-width:0;border:1px dashed #b9a588;border-radius:4px;background:#f9f2e6;color:#bcaa90;font:400 25px/1.3 'Noto Serif JP',serif}
+.pm-weave-slot.is-filled{border-style:solid;border-color:#b6a080;background:#fffbf2;color:#5c4b36;box-shadow:0 2px 4px #6e53300a}
+.pm-weave-status{min-height:24px;margin:12px 0 0;color:#80715d;font-size:12px;line-height:1.9;overflow-wrap:anywhere}
+.pm-weave-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.pm-weave-actions .pm-weave-answer{flex:1 1 100%}
+#promise-game .pm-weave .pm-weave-answer{border-color:#775c46;background:#775c46;color:#fff9ec}
+#promise-game .pm-weave .pm-weave-answer:hover:not(:disabled){background:#5f4938}
+@media(max-width:600px){
+ .pm-sketch{padding:10px 9px 13px}
+ .pm-weave{padding:15px 13px}
+ .pm-weave-strip{grid-template-columns:1fr;padding:13px;gap:11px}
+ .pm-weave-source{gap:9px;flex-wrap:wrap}
+ .pm-weave-take{width:100%;max-width:none}
+ .pm-weave-letters{justify-content:flex-start}
+ .pm-weave-slots{gap:6px}
+ .pm-weave-slot{height:48px;font-size:23px}
+ .pm-weave-actions{gap:8px}
+ .pm-weave-actions .pm-weave-undo,.pm-weave-actions .pm-weave-reset{flex:1 1 auto}
+}
