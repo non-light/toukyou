@@ -1,0 +1,12 @@
+{
+  "number": 2,
+  "title": "さよならを言わない待ち合わせ",
+  "kind": "farewell",
+  "description": "紬と一緒に、幼なじみの晴から届いた最後の宝探しをたどる。",
+  "port": 4182,
+  "source_commit": "6d3050a8cdd568845ded858f2ab349ca7ab380bf",
+  "source_directory": "nazotoki",
+  "original_map_commit": "314300f107a5674b849cd5fdb88f5aa4f0cdec1d",
+  "backend": "static",
+  "standalone": true
+}

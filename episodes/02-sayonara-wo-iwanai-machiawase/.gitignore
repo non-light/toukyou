@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+build/
+server-app/public/
+server-app/dist/
+server-app/.next/
+server-app/.vinext/
+server-app/.wrangler/
+server-app/.sites-runtime/
+*.tsbuildinfo
+*.log
+.env*
+.dev.vars*
+*.zip
